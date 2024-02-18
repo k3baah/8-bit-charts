@@ -45,7 +45,7 @@ const theme = {
         "fill": "#fff",
         "outlineWidth": 0,
         "outlineColor": "transparent",
-        "fontFamily":'"Space Mono", monospace'
+        "fontFamily": '"Space Mono", monospace'
       }
     }
   },
@@ -127,8 +127,10 @@ const borderWidth = 4; // Width of the border
 
 const CustomLayer = ({ bars }) => {
   return (
+    
     <g>
       {bars.map(bar => {
+        console.log(bar.data.formattedValue);
         // BLUES
         // const mainColor = '#3b82f6'; // Main color of the bar
         // const shadowColor = '#2877F6' // Darker shade for the shadow
@@ -167,6 +169,7 @@ const CustomLayer = ({ bars }) => {
         // const borderColor = '#362662' // Lighter shade for the light
 
         return (
+
           <React.Fragment key={bar.key}>
             {/* Main part of the bar */}
             <rect
@@ -232,6 +235,14 @@ const CustomLayer = ({ bars }) => {
               height={val} // Height of the edge
               fill={shadowColor}
             />
+            <text
+              x={bar.x + bar.width / 2}
+              y={bar.y - 25} // Adjusted to place the text just above the bar
+              textAnchor="middle"
+              style={{ fill: '#fff', fontFamily: '"Press Start 2P"', fontSize:'16px' }} // Ensure the fill color makes the text visible
+            >
+              {bar.data.formattedValue}
+            </text>
           </React.Fragment>
         );
       })}
@@ -243,7 +254,8 @@ const MyResponsiveBar = () => (
   <div className="nivo-bar" style={{ height: 400 }}>
     <ResponsiveBar
       data={data}
-      layers={['grid', 'axes', CustomLayer, 'markers', 'legends', 'annotations']}
+      layers={['grid', 'axes', 'bars',  CustomLayer, 'markers', 'legends', 'annotations']}
+      // enableLabel={true}
       keys={['food']}
       indexBy="country"
       margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
@@ -303,10 +315,13 @@ function App() {
   };
   return (
     <div>
-      <h2 className = 'title' style={{ textAlign: 'center', fontSize: '48px', padding: '0px', color: 'white' }}>My Nivo Chart</h2>
-      <h2 className = 'subtitle' style={{ textAlign: 'center', fontSize: '32px',  color: '#6b7280' }}>My Nivo Chart</h2>
+      <h2 className='title' style={{ textAlign: 'center', fontSize: '48px', padding: '0px', color: 'white' }}>Messages Sent</h2>
+      <h2 className='subtitle' style={{ textAlign: 'center', fontSize: '32px', color: '#6b7280' }}>Per Person, 2023</h2>
       <div ref={chartRef}><MyResponsiveBar /></div>
-      <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
+      <div style={{ textAlign: 'center' }}>
+        <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
+      </div>
+
     </div>
   );
 }
