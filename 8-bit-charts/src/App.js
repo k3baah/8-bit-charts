@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { ResponsiveBar } from '@nivo/bar';
+import domToImage from 'dom-to-image';
+
 
 // Sample data
 const data = [
@@ -11,111 +13,111 @@ const data = [
 ];
 
 const theme = {
-  "background": "#ffffff",
+  "background": "transparent",
   "text": {
+    "fontSize": 11,
+    "fill": "#333333",
+    "outlineWidth": 0,
+    "outlineColor": "transparent"
+  },
+  "axis": {
+    "domain": {
+      "line": {
+        "stroke": "#777777",
+        "strokeWidth": 1
+      }
+    },
+    "legend": {
+      "text": {
+        "fontSize": 12,
+        "fill": "#333333",
+        "outlineWidth": 0,
+        "outlineColor": "transparent"
+      }
+    },
+    "ticks": {
+      "line": {
+        "stroke": "#777777",
+        "strokeWidth": 1
+      },
+      "text": {
+        "fontSize": 11,
+        "fill": "#333333",
+        "outlineWidth": 0,
+        "outlineColor": "transparent"
+      }
+    }
+  },
+  "grid": {
+    "line": {
+      "stroke": "#dddddd",
+      "strokeWidth": 1
+    }
+  },
+  "legends": {
+    "title": {
+      "text": {
+        "fontSize": 11,
+        "fill": "#333333",
+        "outlineWidth": 0,
+        "outlineColor": "transparent"
+      }
+    },
+    "text": {
       "fontSize": 11,
       "fill": "#333333",
       "outlineWidth": 0,
       "outlineColor": "transparent"
-  },
-  "axis": {
-      "domain": {
-          "line": {
-              "stroke": "#777777",
-              "strokeWidth": 1
-          }
-      },
-      "legend": {
-          "text": {
-              "fontSize": 12,
-              "fill": "#333333",
-              "outlineWidth": 0,
-              "outlineColor": "transparent"
-          }
-      },
-      "ticks": {
-          "line": {
-              "stroke": "#777777",
-              "strokeWidth": 1
-          },
-          "text": {
-              "fontSize": 11,
-              "fill": "#333333",
-              "outlineWidth": 0,
-              "outlineColor": "transparent"
-          }
-      }
-  },
-  "grid": {
-      "line": {
-          "stroke": "#dddddd",
-          "strokeWidth": 1
-      }
-  },
-  "legends": {
-      "title": {
-          "text": {
-              "fontSize": 11,
-              "fill": "#333333",
-              "outlineWidth": 0,
-              "outlineColor": "transparent"
-          }
-      },
+    },
+    "ticks": {
+      "line": {},
       "text": {
-          "fontSize": 11,
-          "fill": "#333333",
-          "outlineWidth": 0,
-          "outlineColor": "transparent"
-      },
-      "ticks": {
-          "line": {},
-          "text": {
-              "fontSize": 10,
-              "fill": "#333333",
-              "outlineWidth": 0,
-              "outlineColor": "transparent"
-          }
+        "fontSize": 10,
+        "fill": "#333333",
+        "outlineWidth": 0,
+        "outlineColor": "transparent"
       }
+    }
   },
   "annotations": {
-      "text": {
-          "fontSize": 13,
-          "fill": "#333333",
-          "outlineWidth": 2,
-          "outlineColor": "#ffffff",
-          "outlineOpacity": 1
-      },
-      "link": {
-          "stroke": "#000000",
-          "strokeWidth": 1,
-          "outlineWidth": 2,
-          "outlineColor": "#ffffff",
-          "outlineOpacity": 1
-      },
-      "outline": {
-          "stroke": "#000000",
-          "strokeWidth": 2,
-          "outlineWidth": 2,
-          "outlineColor": "#ffffff",
-          "outlineOpacity": 1
-      },
-      "symbol": {
-          "fill": "#000000",
-          "outlineWidth": 2,
-          "outlineColor": "#ffffff",
-          "outlineOpacity": 1
-      }
+    "text": {
+      "fontSize": 13,
+      "fill": "#333333",
+      "outlineWidth": 2,
+      "outlineColor": "#ffffff",
+      "outlineOpacity": 1
+    },
+    "link": {
+      "stroke": "#000000",
+      "strokeWidth": 1,
+      "outlineWidth": 2,
+      "outlineColor": "#ffffff",
+      "outlineOpacity": 1
+    },
+    "outline": {
+      "stroke": "#000000",
+      "strokeWidth": 2,
+      "outlineWidth": 2,
+      "outlineColor": "#ffffff",
+      "outlineOpacity": 1
+    },
+    "symbol": {
+      "fill": "#000000",
+      "outlineWidth": 2,
+      "outlineColor": "#ffffff",
+      "outlineOpacity": 1
+    }
   },
   "tooltip": {
-      "container": {
-          "background": "#ffffff",
-          "fontSize": 12
-      },
-      "basic": {},
-      "chip": {},
-      "table": {},
-      "tableCell": {},
-      "tableCellValue": {}
+    "container": {
+      "background": "#ffffff",
+      "fontSize": 12
+    },
+    "basic": {},
+    "chip": {},
+    "table": {},
+    "tableCell": {},
+    "tableCellValue": {}
   }
 }
 
@@ -129,6 +131,7 @@ const CustomLayer = ({ bars }) => {
         const mainColor = '#3b82f6'; // Main color of the bar
         const shadowColor = '#2877F6' // Darker shade for the shadow
         const lightColor = '#77A8F9' // Lighter shade for the light
+        const borderColor = '#0748B0' // Lighter shade for the light
 
         return (
           <React.Fragment key={bar.key}>
@@ -140,7 +143,30 @@ const CustomLayer = ({ bars }) => {
               height={bar.height}
               fill={mainColor}
             />
-            
+
+            {/* Border */}
+            <rect
+              x={bar.x - val} // Position to the left of the main bar
+              y={bar.y}
+              width={val} // Width of the border
+              height={bar.height}
+              fill={borderColor}
+            />
+            <rect
+              x={bar.x}
+              y={bar.y - val} // Position above the main bar
+              width={bar.width}
+              height={val} // Height of the border
+              fill={borderColor}
+            />
+            <rect
+              x={bar.x + bar.width} // Position to the right of the main bar
+              y={bar.y}
+              width={val} // Width of the border
+              height={bar.height}
+              fill={borderColor}
+            />
+
             {/* Right edge (light) */}
             <rect
               x={bar.x + bar.width - val} // Position at the right of the main bar
@@ -149,8 +175,8 @@ const CustomLayer = ({ bars }) => {
               height={bar.height}
               fill={lightColor}
             />
-             {/* Left edge (shadow) */}
-             <rect
+            {/* Left edge (shadow) */}
+            <rect
               x={bar.x}
               y={bar.y}
               width={val} // Width of the edge
@@ -180,17 +206,12 @@ const CustomLayer = ({ bars }) => {
   );
 };
 
-// ... Rest of your MyResponsiveBar and App component
-
-// ... Rest of your MyResponsiveBar and App component
-
-
 const MyResponsiveBar = () => (
-  <div className ="nivo-bar" style={{ height: 400 }}>
+  <div className="nivo-bar" style={{ height: 400 }}>
     <ResponsiveBar
       data={data}
       // barComponent={CustomBarComponent}
-      layers={['grid', 'axes',  CustomLayer, 'markers', 'legends', 'annotations']}
+      layers={['grid', 'axes', CustomLayer, 'markers', 'legends', 'annotations']}
       keys={['food']}
       indexBy="country"
       margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
@@ -199,7 +220,7 @@ const MyResponsiveBar = () => (
       indexScale={{ type: 'band', round: true }}
       colors={['#60a5fa']}
       // borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-      borderColor = {['#000']}
+      borderColor={['#000']}
       // borderWidth = {6}
       axisTop={null}
       axisRight={null}
@@ -225,13 +246,37 @@ const MyResponsiveBar = () => (
       animate={true}
       motionStiffness={90}
       motionDamping={15}
-      theme = {theme}
+      theme={theme}
     />
   </div>
 );
 
 function App() {
-  return <MyResponsiveBar />;
+  const chartRef = useRef();
+
+  const exportToPNG = () => {
+    domToImage.toPng(chartRef.current, {
+      style: {
+        backgroundColor: 'transparent', // Set background color to transparent
+      }
+    })
+    .then((dataUrl) => {
+      // Create a link to download the image
+      const link = document.createElement('a');
+      link.download = 'my-chart.png';
+      link.href = dataUrl;
+      link.click();
+    })
+    .catch((error) => {
+      console.error('Error exporting the chart:', error);
+    });
+  };
+  return (
+    <div>
+      <div ref={chartRef}><MyResponsiveBar /></div>
+      <button onClick={exportToPNG}>Export as PNG</button>
+    </div>
+  );
 }
 
 export default App;
