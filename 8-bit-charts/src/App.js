@@ -303,7 +303,8 @@ function App() {
   };
   return (
     <div>
-      <h2 className = 'title' style={{ textAlign: 'center', fontSize: '64px', padding: '20px', color: 'white' }}>My Nivo Chart</h2>
+      <h2 className = 'title' style={{ textAlign: 'center', fontSize: '48px', padding: '0px', color: 'white' }}>My Nivo Chart</h2>
+      <h2 className = 'subtitle' style={{ textAlign: 'center', fontSize: '32px',  color: '#6b7280' }}>My Nivo Chart</h2>
       <div ref={chartRef}><MyResponsiveBar /></div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>
