@@ -5,11 +5,11 @@ import domToImage from 'dom-to-image';
 
 // Sample data
 const data = [
-  { country: 'USA', food: 60 },
-  { country: 'France', food: 80 },
-  { country: 'Germany', food: 45 },
-  { country: 'Japan', food: 70 },
-  { country: 'China', food: 50 },
+  { country: 'Watson', food: 60 },
+  { country: 'Froud', food: 80 },
+  { country: 'Kofi', food: 45 },
+  { country: 'George', food: 70 },
+  { country: 'Steve', food: 50 },
 ];
 
 const theme = {
@@ -44,7 +44,8 @@ const theme = {
         "fontSize": 20,
         "fill": "#fff",
         "outlineWidth": 0,
-        "outlineColor": "transparent"
+        "outlineColor": "transparent",
+        "fontFamily":'"Space Mono", monospace'
       }
     }
   },
@@ -302,7 +303,7 @@ function App() {
   };
   return (
     <div>
-      <h2 style={{ textAlign: 'center', fontSize: '64px', padding: '20px', color: 'white' }}>My Nivo Chart</h2>
+      <h2 className = 'title' style={{ textAlign: 'center', fontSize: '64px', padding: '20px', color: 'white' }}>My Nivo Chart</h2>
       <div ref={chartRef}><MyResponsiveBar /></div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>
