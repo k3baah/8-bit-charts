@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Targeting SVG elements inside the Nivo chart container */
+.nivo-bar .bars rect {
+  image-rendering: pixelate;
+  image-rendering: crisp-edges;
+  fill: #000;
+}
