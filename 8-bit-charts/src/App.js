@@ -15,7 +15,7 @@ const data = [
 const theme = {
   "background": "transparent",
   "text": {
-    "fontSize": 11,
+    "fontSize": 24,
     "fill": "#333333",
     "outlineWidth": 0,
     "outlineColor": "transparent"
@@ -29,8 +29,8 @@ const theme = {
     },
     "legend": {
       "text": {
-        "fontSize": 12,
-        "fill": "#333333",
+        "fontSize": 24,
+        "fill": "transparent",
         "outlineWidth": 0,
         "outlineColor": "transparent"
       }
@@ -41,8 +41,8 @@ const theme = {
         "strokeWidth": 1
       },
       "text": {
-        "fontSize": 11,
-        "fill": "#333333",
+        "fontSize": 20,
+        "fill": "#fff",
         "outlineWidth": 0,
         "outlineColor": "transparent"
       }
@@ -51,7 +51,7 @@ const theme = {
   "grid": {
     "line": {
       "stroke": "#dddddd",
-      "strokeWidth": 1
+      "strokeWidth": 0
     }
   },
   "legends": {
@@ -128,10 +128,42 @@ const CustomLayer = ({ bars }) => {
   return (
     <g>
       {bars.map(bar => {
-        const mainColor = '#3b82f6'; // Main color of the bar
-        const shadowColor = '#2877F6' // Darker shade for the shadow
-        const lightColor = '#77A8F9' // Lighter shade for the light
-        const borderColor = '#0748B0' // Lighter shade for the light
+        // BLUES
+        // const mainColor = '#3b82f6'; // Main color of the bar
+        // const shadowColor = '#2877F6' // Darker shade for the shadow
+        // const lightColor = '#77A8F9' // Lighter shade for the light
+        // const borderColor = '#0748B0' // Lighter shade for the light
+
+
+        // BLUES 2
+        // const mainColor = '#0476E2'; // Main color of the bar
+        // const shadowColor = '#095ED3' // Darker shade for the shadow
+        // const lightColor = '#4CB4FD' // Lighter shade for the light
+        // const borderColor = '#17499E' // Lighter shade for the light
+
+        // GREENS
+        // const mainColor = '#00CC3F'; // Main color of the bar
+        // const shadowColor = '#02AC45' // Darker shade for the shadow
+        // const lightColor = '#47FF46' // Lighter shade for the light
+        // const borderColor = '#026F49' // Lighter shade for the light
+
+        // // YELLOWS
+        const mainColor = '#FFC740'; // Main color of the bar
+        const shadowColor = '#FE8614' // Darker shade for the shadow
+        const lightColor = '#FADEAE' // Lighter shade for the light
+        const borderColor = '#D45715' // Lighter shade for the light
+
+        // // REDS
+        // const mainColor = '#E82023'; // Main color of the bar
+        // const shadowColor = '#C0060B' // Darker shade for the shadow
+        // const lightColor = '#FA7B83' // Lighter shade for the light
+        // const borderColor = '#940002' // Lighter shade for the light
+
+        // DARK PURPLE
+        // const mainColor = '#4119C6'; // Main color of the bar
+        // const shadowColor = '#300BA9' // Darker shade for the shadow
+        // const lightColor = '#552ED9' // Lighter shade for the light
+        // const borderColor = '#362662' // Lighter shade for the light
 
         return (
           <React.Fragment key={bar.key}>
@@ -210,7 +242,6 @@ const MyResponsiveBar = () => (
   <div className="nivo-bar" style={{ height: 400 }}>
     <ResponsiveBar
       data={data}
-      // barComponent={CustomBarComponent}
       layers={['grid', 'axes', CustomLayer, 'markers', 'legends', 'annotations']}
       keys={['food']}
       indexBy="country"
@@ -219,9 +250,7 @@ const MyResponsiveBar = () => (
       valueScale={{ type: 'linear' }}
       indexScale={{ type: 'band', round: true }}
       colors={['#60a5fa']}
-      // borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
       borderColor={['#000']}
-      // borderWidth = {6}
       axisTop={null}
       axisRight={null}
       axisBottom={{
@@ -260,21 +289,22 @@ function App() {
         backgroundColor: 'transparent', // Set background color to transparent
       }
     })
-    .then((dataUrl) => {
-      // Create a link to download the image
-      const link = document.createElement('a');
-      link.download = 'my-chart.png';
-      link.href = dataUrl;
-      link.click();
-    })
-    .catch((error) => {
-      console.error('Error exporting the chart:', error);
-    });
+      .then((dataUrl) => {
+        // Create a link to download the image
+        const link = document.createElement('a');
+        link.download = 'my-chart.png';
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((error) => {
+        console.error('Error exporting the chart:', error);
+      });
   };
   return (
     <div>
+      <h2 style={{ textAlign: 'center', fontSize: '64px', padding: '20px', color: 'white' }}>My Nivo Chart</h2>
       <div ref={chartRef}><MyResponsiveBar /></div>
-      <button onClick={exportToPNG}>Export as PNG</button>
+      <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>
   );
 }

@@ -12,9 +12,6 @@ code {
     monospace;
 }
 
-/* Targeting SVG elements inside the Nivo chart container */
-.nivo-bar .bars rect {
-  image-rendering: pixelate;
-  image-rendering: crisp-edges;
-  fill: #000;
+body {
+  background: #1E1E1E;
 }
