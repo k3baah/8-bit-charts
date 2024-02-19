@@ -9,12 +9,12 @@ import Papa from 'papaparse';
 function App() {
 
   const containerRef = useRef();
-
   const [data, setData] = useState([]);
+  const filename = '1.3 Messages Per Year.csv'
 
   useEffect(() => {
     const loadCsvData = () => {
-      fetch('/data/1.3 Messages Per Year.csv')
+      fetch(`/data/${filename}`)
         .then(response => response.text())
         .then(csvText => {
           Papa.parse(csvText, {
@@ -60,7 +60,7 @@ function App() {
       .then((dataUrl) => {
         // Create a link to download the image
         const link = document.createElement('a');
-        link.download = 'my-chart.png';
+        link.download = `${filename}.png`;
         link.href = dataUrl;
         link.click();
       })
@@ -75,7 +75,7 @@ function App() {
         <h2 className='title' style={{ fontSize: '48px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2>
         <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>Per Person, 2023</h2>
       </div>
-      <div style={{padding: '48px'}}><MyResponsiveBar /></div>
+      <div style={{paddingTop: '48px'}}><MyResponsiveBar /></div>
       </div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>
