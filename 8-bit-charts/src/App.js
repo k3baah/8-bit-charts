@@ -5,6 +5,7 @@ import domToImage from 'dom-to-image';
 import CustomLayer from './BarDesign';
 import theme from './ChartTheme'
 import Papa from 'papaparse';
+import 'nes.icons/css/nes-icons.min.css';
 
 function App() {
 
@@ -47,6 +48,7 @@ function App() {
         valueScale={{ type: 'linear' }}
         indexScale={{ type: 'band', round: true }}
         theme={theme}
+        axisLeft={null}
       />
     </div>
   );
@@ -69,13 +71,20 @@ function App() {
       });
   };
   return (
-    <div style={{ textAlign: 'center', padding:'24px'}}>
-      <div ref = {containerRef} style={{ textAlign: 'center', padding:'32px'}}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-        <h2 className='title' style={{ fontSize: '48px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2>
-        <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>Per Person, 2023</h2>
-      </div>
-      <div style={{paddingTop: '48px'}}><MyResponsiveBar /></div>
+    <div>
+      <div ref={containerRef} style={{ padding: '32px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
+          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>Messages Sent</h2>
+
+          <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
+            <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>61,566</h2>
+            <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding:'24px' }}>
+              <i className="nes-icon caret-down"></i><span className='title' style={{ marginLeft: '8px' }}>21%</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ paddingTop: '120px' }}><MyResponsiveBar /></div>
       </div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>

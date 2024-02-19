@@ -33,7 +33,7 @@ const theme = {
           "outlineColor": "transparent",
           "fontFamily": '"Space Mono", monospace'
         }
-      }
+      },
     },
     "grid": {
       "line": {
