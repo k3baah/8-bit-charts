@@ -27,7 +27,7 @@ const theme = {
           "strokeWidth": 1
         },
         "text": {
-          "fontSize": 20,
+          "fontSize": 16,
           "fill": "#fff",
           "outlineWidth": 0,
           "outlineColor": "transparent",
