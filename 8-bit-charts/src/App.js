@@ -18,6 +18,7 @@ function App() {
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
     '1.5 Messages Per Week.csv',
+    '1.6 Average Messages Per Day Of Week.csv'
     // Add more filenames as needed
   ]);
 
@@ -85,7 +86,9 @@ function App() {
         console.error('Error exporting the chart:', error);
       });
   };
+  const cleanFilename = filename.replace(/^\d+\.\d+\s+|\.\w+$/g, '');
   return (
+    
     <div>
       <div>
         <select value={filename} onChange={e => setFilename(e.target.value)}>
@@ -110,14 +113,14 @@ function App() {
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
-          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>Messages Sent</h2>
-
+          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{cleanFilename}</h2>
+{/* 
           <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
             <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>61,566</h2>
             <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
               <i className="nes-icon caret-down"></i><span className='title' style={{ marginLeft: '8px' }}>21%</span>
             </div>
-          </div>
+          </div> */}
         </div>
         <div style={{ paddingTop: '120px' }}><MyResponsiveBar /></div>
       </div>

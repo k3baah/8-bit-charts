@@ -41,29 +41,13 @@ export const colorSets = {
 };
 const currentColorSet = colorSets.YELLOWS;
 
-// Function to dynamically assign color sets to categories
-const assignColorSetsToCategories = (bars, colorByColumn) => {
-    const uniqueCategories = [...new Set(bars.map(bar => bar.data[colorByColumn]))];
-    const colorSetKeys = Object.keys(colorSets);
-    const categoryColorMapping = {};
-  
-    uniqueCategories.forEach((category, index) => {
-      // Cycle through color sets if there are more categories than color sets
-      const colorSetKey = colorSetKeys[index % colorSetKeys.length];
-      categoryColorMapping[category] = colorSets[colorSetKey];
-    });
-  
-    return categoryColorMapping;
-  };
 
 const CustomLayer = ({ bars, colorByColumn = 'month' }) => {
-    const categoryColorMapping = assignColorSetsToCategories(bars, colorByColumn);
     return (
       <g>
         {bars.map(bar => {
-        //   const { mainColor, shadowColor, lightColor, borderColor } = currentColorSet;
+          const { mainColor, shadowColor, lightColor, borderColor } = currentColorSet;
         const category = bar.data[colorByColumn];
-        const { mainColor, shadowColor, lightColor, borderColor } = categoryColorMapping[category];
 
   
           return (
