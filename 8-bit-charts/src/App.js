@@ -11,7 +11,18 @@ function App() {
 
   const containerRef = useRef();
   const [data, setData] = useState([]);
-  const filename = '1.3 Messages Per Year.csv'
+  // const filename = '1.3 Messages Per Year.csv'
+  const [filename, setFilename] = useState('1.3 Messages Per Year.csv'); // Default filename
+  const [xColumn, setXColumn] = useState('year'); // Default x-axis column
+  const [yColumn, setYColumn] = useState('message_count'); // Default y-axis column
+  const [availableFiles, setAvailableFiles] = useState([
+    '1.3 Messages Per Year.csv',
+    '1.5 Messages Per Week.csv',
+    // Add more filenames as needed
+  ]);
+
+
+  const [columnHeaders, setColumnHeaders] = useState([]);
 
   useEffect(() => {
     const loadCsvData = () => {
@@ -20,12 +31,16 @@ function App() {
         .then(csvText => {
           Papa.parse(csvText, {
             complete: (results) => {
-              // Assuming your CSV has 'year' and 'message_count' columns
+              // Assuming the first row contains headers
+              const headers = results.meta.fields;
+              setColumnHeaders(headers); // Update state with column headers
+
+              // Optionally, process the data rows as before
               const formattedData = results.data.map(row => ({
-                year: row.year,
-                message_count: +row.message_count, // Convert message_count to a number
+                [xColumn]: row[xColumn],
+                [yColumn]: +row[yColumn], // Convert to number
               }));
-              setData(formattedData); // Update state with the formatted data
+              setData(formattedData);
             },
             header: true,
           });
@@ -34,15 +49,15 @@ function App() {
     };
 
     loadCsvData();
-  }, []);
+  }, [filename, xColumn, yColumn]);
 
   const MyResponsiveBar = () => (
     <div style={{ height: 400 }}>
       <ResponsiveBar
         data={data}
+        keys={[yColumn]}
+        indexBy={xColumn}
         layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
-        keys={['message_count']}
-        indexBy="year"
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: 'linear' }}
@@ -72,6 +87,26 @@ function App() {
   };
   return (
     <div>
+      <div>
+        <select value={filename} onChange={e => setFilename(e.target.value)}>
+          {availableFiles.map(file => (
+            <option key={file} value={file}>{file}</option>
+          ))}
+        </select>
+
+        <select value={xColumn} onChange={e => setXColumn(e.target.value)}>
+          {columnHeaders.map(header => (
+            <option key={header} value={header}>{header}</option>
+          ))}
+        </select>
+
+        <select value={yColumn} onChange={e => setYColumn(e.target.value)}>
+          {columnHeaders.map(header => (
+            <option key={header} value={header}>{header}</option>
+          ))}
+        </select>
+      </div>
+
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
@@ -79,7 +114,7 @@ function App() {
 
           <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
             <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>61,566</h2>
-            <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding:'24px' }}>
+            <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
               <i className="nes-icon caret-down"></i><span className='title' style={{ marginLeft: '8px' }}>21%</span>
             </div>
           </div>
