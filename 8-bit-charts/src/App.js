@@ -5,6 +5,7 @@ import domToImage from 'dom-to-image';
 import CustomLayer from './BarDesign';
 import theme from './ChartTheme'
 import Papa from 'papaparse';
+import colorSets from './BarDesign'
 import 'nes.icons/css/nes-icons.min.css';
 
 function App() {
@@ -22,6 +23,9 @@ function App() {
   ]);
 
   const [columnHeaders, setColumnHeaders] = useState([]);
+  const [colorMode, setColorMode] = useState('dynamic'); // 'dynamic', 'solid'
+  const [selectedColorSet, setSelectedColorSet] = useState('BLUES'); // Default to 'BLUES'
+  const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // 'key' or 'indexValue'
 
   useEffect(() => {
     const loadCsvData = () => {
@@ -60,7 +64,8 @@ function App() {
         // keys={[yColumn]}
         keys={yColumns}
         indexBy={xColumn}
-        layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
+        // layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
+        layers={['grid', 'axes', 'bars', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSet={selectedColorSet} dynamicColoringMode={dynamicColoringMode} />, 'markers', 'legends', 'annotations']}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: 'linear' }}
@@ -112,6 +117,37 @@ function App() {
           ))}
         </select>
       </div>
+
+      <div>
+  <label>
+    Color Mode:
+    <select value={colorMode} onChange={e => setColorMode(e.target.value)}>
+      <option value="dynamic">Dynamic</option>
+      <option value="solid">Solid</option>
+    </select>
+  </label>
+  {colorMode === 'dynamic' && (
+    <>
+      <label>
+        Dynamic Coloring Mode:
+        <select value={dynamicColoringMode} onChange={e => setDynamicColoringMode(e.target.value)}>
+          <option value="key">By Key</option>
+          <option value="indexValue">By Index Value</option>
+        </select>
+      </label>
+    </>
+  )}
+  {colorMode === 'solid' && (
+    <label>
+      Select Color Set:
+      <select value={selectedColorSet} onChange={e => setSelectedColorSet(e.target.value)}>
+        {Object.keys(colorSets).map(key => (
+          <option key={key} value={key}>{key}</option>
+        ))}
+      </select>
+    </label>
+  )}
+</div>
 
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
