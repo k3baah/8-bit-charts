@@ -13,7 +13,7 @@ function App() {
   const [data, setData] = useState([]);
   const [filename, setFilename] = useState('1.3 Messages Per Year.csv'); // Default filename
   const [xColumn, setXColumn] = useState('year'); // Default x-axis column
-  const [yColumn, setYColumn] = useState('message_count'); // Default y-axis column
+  const [yColumns, setYColumns] = useState(['message_count']); // Default y-axis column
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
     '1.5 Messages Per Week.csv',
@@ -51,16 +51,15 @@ function App() {
     };
 
     loadCsvData();
-  }, [filename, xColumn, yColumn]);
+  }, [filename, xColumn, yColumns]);
 
   const MyResponsiveBar = () => (
     <div style={{ height: 400 }}>
       <ResponsiveBar
         data={data}
         // keys={[yColumn]}
-        keys={['message_count', 'py_message_count']} 
-        // indexBy={xColumn}
-        indexBy='year'
+        keys={yColumns}
+        indexBy={xColumn}
         layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
@@ -68,68 +67,6 @@ function App() {
         indexScale={{ type: 'band', round: true }}
         theme={theme}
         axisLeft={null}
-      />
-    </div>
-  );
-  const DefaultResponsiveBar = () => (
-    <div style={{ height: 400 }}>
-      <ResponsiveBar
-        data={data}
-        // keys={[yColumn]} 
-        keys={['message_count', 'py_message_count']} 
-        // indexBy={xColumn}
-        indexBy={'year'}
-        margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-        padding={0.3}
-        valueScale={{ type: 'linear' }}
-        indexScale={{ type: 'band', round: true }}
-        colors={['#FFC740', '#fff']}
-        borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: 'index',
-          legendPosition: 'middle',
-          legendOffset: 32
-        }}
-        axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: 'value',
-          legendPosition: 'middle',
-          legendOffset: -40
-        }}
-        labelSkipWidth={12}
-        labelSkipHeight={12}
-        labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-        legends={[
-          {
-            dataFrom: 'keys',
-            anchor: 'bottom-right',
-            direction: 'column',
-            justify: false,
-            translateX: 120,
-            translateY: 0,
-            itemsSpacing: 2,
-            itemWidth: 100,
-            itemHeight: 20,
-            itemDirection: 'left-to-right',
-            itemOpacity: 0.85,
-            symbolSize: 20,
-            effects: [
-              {
-                on: 'hover',
-                style: {
-                  itemOpacity: 1
-                }
-              }
-            ]
-          }
-        ]}
       />
     </div>
   );
@@ -154,7 +91,7 @@ function App() {
   };
   const cleanFilename = filename.replace(/^\d+\.\d+\s+|\.\w+$/g, '');
   return (
-    
+
     <div>
       <div>
         <select value={filename} onChange={e => setFilename(e.target.value)}>
@@ -169,7 +106,7 @@ function App() {
           ))}
         </select>
 
-        <select value={yColumn} onChange={e => setYColumn(e.target.value)}>
+        <select multiple value={yColumns} onChange={e => setYColumns([...e.target.selectedOptions].map(option => option.value))}>
           {columnHeaders.map(header => (
             <option key={header} value={header}>{header}</option>
           ))}
@@ -180,7 +117,7 @@ function App() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
           <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{cleanFilename}</h2>
-{/* 
+          {/* 
           <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
             <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>61,566</h2>
             <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
