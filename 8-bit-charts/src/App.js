@@ -11,7 +11,6 @@ function App() {
 
   const containerRef = useRef();
   const [data, setData] = useState([]);
-  // const filename = '1.3 Messages Per Year.csv'
   const [filename, setFilename] = useState('1.3 Messages Per Year.csv'); // Default filename
   const [xColumn, setXColumn] = useState('year'); // Default x-axis column
   const [yColumn, setYColumn] = useState('message_count'); // Default y-axis column
@@ -21,7 +20,6 @@ function App() {
     '1.6 Average Messages Per Day Of Week.csv'
     // Add more filenames as needed
   ]);
-
 
   const [columnHeaders, setColumnHeaders] = useState([]);
 
@@ -36,11 +34,14 @@ function App() {
               const headers = results.meta.fields;
               setColumnHeaders(headers); // Update state with column headers
 
-              // Optionally, process the data rows as before
-              const formattedData = results.data.map(row => ({
-                [xColumn]: row[xColumn],
-                [yColumn]: +row[yColumn], // Convert to number
-              }));
+              // Process the data rows to include all columns dynamically
+              const formattedData = results.data.map(row => {
+                const rowData = {};
+                headers.forEach(header => {
+                  rowData[header] = row[header];
+                });
+                return rowData;
+              });
               setData(formattedData);
             },
             header: true,
@@ -56,8 +57,10 @@ function App() {
     <div style={{ height: 400 }}>
       <ResponsiveBar
         data={data}
-        keys={[yColumn]}
-        indexBy={xColumn}
+        // keys={[yColumn]}
+        keys={['message_count', 'py_message_count']} 
+        // indexBy={xColumn}
+        indexBy='year'
         layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
@@ -68,6 +71,69 @@ function App() {
       />
     </div>
   );
+  const DefaultResponsiveBar = () => (
+    <div style={{ height: 400 }}>
+      <ResponsiveBar
+        data={data}
+        // keys={[yColumn]} 
+        keys={['message_count', 'py_message_count']} 
+        // indexBy={xColumn}
+        indexBy={'year'}
+        margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+        padding={0.3}
+        valueScale={{ type: 'linear' }}
+        indexScale={{ type: 'band', round: true }}
+        colors={['#FFC740', '#fff']}
+        borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+        axisTop={null}
+        axisRight={null}
+        axisBottom={{
+          tickSize: 5,
+          tickPadding: 5,
+          tickRotation: 0,
+          legend: 'index',
+          legendPosition: 'middle',
+          legendOffset: 32
+        }}
+        axisLeft={{
+          tickSize: 5,
+          tickPadding: 5,
+          tickRotation: 0,
+          legend: 'value',
+          legendPosition: 'middle',
+          legendOffset: -40
+        }}
+        labelSkipWidth={12}
+        labelSkipHeight={12}
+        labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+        legends={[
+          {
+            dataFrom: 'keys',
+            anchor: 'bottom-right',
+            direction: 'column',
+            justify: false,
+            translateX: 120,
+            translateY: 0,
+            itemsSpacing: 2,
+            itemWidth: 100,
+            itemHeight: 20,
+            itemDirection: 'left-to-right',
+            itemOpacity: 0.85,
+            symbolSize: 20,
+            effects: [
+              {
+                on: 'hover',
+                style: {
+                  itemOpacity: 1
+                }
+              }
+            ]
+          }
+        ]}
+      />
+    </div>
+  );
+
 
   const exportToPNG = () => {
     domToImage.toPng(containerRef.current, {
@@ -123,6 +189,7 @@ function App() {
           </div> */}
         </div>
         <div style={{ paddingTop: '120px' }}><MyResponsiveBar /></div>
+        {/* <div style={{ paddingTop: '120px' }}><DefaultResponsiveBar /></div> */}
       </div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
     </div>

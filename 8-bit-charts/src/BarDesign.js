@@ -8,12 +8,12 @@ export const colorSets = {
     lightColor: '#77A8F9',
     borderColor: '#0748B0',
   },
-  BLUES2: {
-    mainColor: '#0476E2',
-    shadowColor: '#095ED3',
-    lightColor: '#4CB4FD',
-    borderColor: '#17499E',
-  },
+//   BLUES2: {
+//     mainColor: '#0476E2',
+//     shadowColor: '#095ED3',
+//     lightColor: '#4CB4FD',
+//     borderColor: '#17499E',
+//   },
   GREENS: {
     mainColor: '#00CC3F',
     shadowColor: '#02AC45',
@@ -41,13 +41,42 @@ export const colorSets = {
 };
 const currentColorSet = colorSets.YELLOWS;
 
+// Function to dynamically assign color sets to keys
+const assignColorSetsToKeys = (bars) => {
+    const keys = [...new Set(bars.map(bar => bar.data.id))];
+    const colorSetKeys = Object.keys(colorSets);
+    const keyColorMapping = {};
+  
+    keys.forEach((key, index) => {
+      keyColorMapping[key] = colorSets[colorSetKeys[index % colorSetKeys.length]];
+    });
+  
+    return keyColorMapping;
+  };
+  
+  // Function to dynamically assign color sets to index values (e.g., years)
+const assignColorSetsToIndexValues = (bars) => {
+    const indexValues = [...new Set(bars.map(bar => bar.data.indexValue))];
+    const colorSetKeys = Object.keys(colorSets);
+    const indexValueColorMapping = {};
+  
+    indexValues.forEach((value, index) => {
+      indexValueColorMapping[value] = colorSets[colorSetKeys[index % colorSetKeys.length]];
+    });
+  
+    return indexValueColorMapping;
+  };
 
-const CustomLayer = ({ bars, colorByColumn = 'month' }) => {
+
+const CustomLayer = ({ bars, index}) => {
+    const keyColorMapping = assignColorSetsToKeys(bars);
+    const indexValueColorMapping = assignColorSetsToIndexValues(bars);
     return (
       <g>
         {bars.map(bar => {
-          const { mainColor, shadowColor, lightColor, borderColor } = currentColorSet;
-        const category = bar.data[colorByColumn];
+            // const { mainColor, shadowColor, lightColor, borderColor } = keyColorMapping[bar.data.id];
+            const { mainColor, shadowColor, lightColor, borderColor } = indexValueColorMapping[bar.data.indexValue] || colorSets.BLUES; // Default to BLUES if not found
+        console.log(bar)
 
   
           return (
