@@ -21,6 +21,9 @@ function App() {
   const toggleHeroMetric = () => {
     setShowHeroMetric(!showHeroMetric);
   };
+  const [filterColumn, setFilterColumn] = useState('');
+  const [filterValue, setFilterValue] = useState('');
+  const [comparisonColumn, setComparisonColumn] = useState('');
 
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
@@ -100,6 +103,56 @@ function App() {
       });
   };
   const cleanFilename = filename.replace(/^\d+\.\d+\s+|\.\w+$/g, '');
+
+  const calculateHeroMetric = () => {
+    let filteredData = data;
+    if (filterColumn && filterValue) {
+      filteredData = data.filter(row => row[filterColumn] == filterValue);
+    }
+
+    let aggregatedValue = 0;
+    switch (aggregationType) {
+      case 'sum':
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0);
+        break;
+      case 'average':
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0) / filteredData.length;
+        break;
+      // Implement other aggregation types as needed
+    }
+
+    return aggregatedValue;
+  };
+
+  const calculateComparisonMetric = () => {
+    let filteredData = data;
+    if (filterColumn && filterValue) {
+      filteredData = data.filter(row => row[filterColumn] == filterValue);
+    }
+
+    let aggregatedValue = 0;
+    switch (aggregationType) {
+      case 'sum':
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0), 0);
+        break;
+      case 'average':
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0), 0) / filteredData.length;
+        break;
+      // Implement other aggregation types as needed
+    }
+
+    return aggregatedValue;
+  };
+
+  const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const heroMetric = calculateHeroMetric();
+  const comparisonMetric = calculateComparisonMetric();
+  const comparisonResult = ((heroMetric - comparisonMetric) / comparisonMetric) * 100;
+  const isComparisonPositive = comparisonResult >= 0;
+
   return (
 
     <div>
@@ -176,8 +229,30 @@ function App() {
           </select>
         </label>
 
-        <button className = 'dropdown' style={{}} onClick={toggleHeroMetric}>Toggle Hero Metric</button>
+        <button className='dropdown' style={{}} onClick={toggleHeroMetric}>Toggle Hero Metric</button>
       </div>
+
+      <div>
+        <label className='subtitle' style={{ color: 'white' }}>Filter Column:
+          <select className='dropdown' value={filterColumn} onChange={e => setFilterColumn(e.target.value)}>
+            {columnHeaders.map(header => (
+              <option key={header} value={header}>{header}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className='subtitle' style={{ color: 'white' }}>Filter Value:
+          <input className='dropdown' value={filterValue} onChange={e => setFilterValue(e.target.value)} />
+        </label>
+      </div>
+
+      <label className='subtitle' style={{ color: 'white' }}>Comparison Column:
+        <select className='dropdown' value={comparisonColumn} onChange={e => setComparisonColumn(e.target.value)}>
+          {columnHeaders.map(header => (
+            <option key={header} value={header}>{header}</option>
+          ))}
+        </select>
+      </label>
 
 
 
@@ -187,9 +262,12 @@ function App() {
           <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{cleanFilename}</h2>
           {showHeroMetric && (
             <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-              <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>61,566</h2>
-              <div style={{ fontSize: '32px', color: 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
-                <i className="nes-icon caret-down"></i><span className='title' style={{ marginLeft: '8px' }}>21%</span>
+              <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>
+                {formatNumberWithCommas(heroMetric)}
+              </h2>
+              <div style={{ fontSize: '32px', color: isComparisonPositive ? 'green' : 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
+                <i className={`nes-icon ${isComparisonPositive ? 'caret-up' : 'caret-down'}`}></i>
+                <span className='title' style={{ marginLeft: '8px' }}>{formatNumberWithCommas(Math.abs(comparisonResult).toFixed(0))}%</span>
               </div>
             </div>
           )}
