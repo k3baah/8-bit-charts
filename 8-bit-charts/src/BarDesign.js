@@ -164,7 +164,7 @@ const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode })
                             textAnchor="middle"
                             style={{ fill: '#fff', fontFamily: '"Press Start 2P"', fontSize: '16px' }} // Ensure the fill color makes the text visible
                         >
-                            {bar.data.formattedValue}
+                            {parseFloat(bar.data.formattedValue).toFixed(0)}
                         </text>
                     </React.Fragment>
                 );

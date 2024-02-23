@@ -5,7 +5,7 @@ import domToImage from 'dom-to-image';
 import CustomLayer from './BarDesign';
 import theme from './ChartTheme'
 import Papa from 'papaparse';
-import colorSets from './BarDesign'
+import { colorSets } from './BarDesign'
 import 'nes.icons/css/nes-icons.min.css';
 
 function App() {
@@ -24,9 +24,12 @@ function App() {
   const [filterColumn, setFilterColumn] = useState('');
   const [filterValue, setFilterValue] = useState('');
   const [comparisonColumn, setComparisonColumn] = useState('');
+  const [comparisonValue, setComparisonValue] = useState('');
+  const [title, setTitle] = useState('');
 
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
+    '1.3.1 Messages p_d Per Year.csv',
     '1.5 Messages Per Week.csv',
     '1.6 Average Messages Per Day Of Week.csv'
     // Add more filenames as needed
@@ -36,6 +39,7 @@ function App() {
   const [colorMode, setColorMode] = useState('dynamic'); // 'dynamic', 'solid'
   const [selectedColorSet, setSelectedColorSet] = useState('BLUES'); // Default to 'BLUES'
   const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // 'key' or 'indexValue'
+
 
   useEffect(() => {
     const loadCsvData = () => {
@@ -66,6 +70,15 @@ function App() {
 
     loadCsvData();
   }, [filename, xColumn, yColumns]);
+
+  const [distinctFilterValues, setDistinctFilterValues] = useState([]);
+
+  useEffect(() => {
+    if (filterColumn) {
+      const uniqueValues = new Set(data.map(row => row[filterColumn]));
+      setDistinctFilterValues([...uniqueValues]);
+    }
+  }, [filterColumn, data]);
 
   const MyResponsiveBar = () => (
     <div style={{ height: 400 }}>
@@ -106,17 +119,18 @@ function App() {
 
   const calculateHeroMetric = () => {
     let filteredData = data;
+    // Ensure both filterColumn and filterValue are considered
     if (filterColumn && filterValue) {
-      filteredData = data.filter(row => row[filterColumn] == filterValue);
+      filteredData = data.filter(row => String(row[filterColumn]) === filterValue);
     }
 
     let aggregatedValue = 0;
     switch (aggregationType) {
       case 'sum':
-        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0);
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0).toFixed(0);
         break;
       case 'average':
-        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0) / filteredData.length;
+        aggregatedValue = (filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0) / filteredData.length).toFixed(0);
         break;
       // Implement other aggregation types as needed
     }
@@ -129,19 +143,18 @@ function App() {
     if (filterColumn && filterValue) {
       filteredData = data.filter(row => row[filterColumn] == filterValue);
     }
-
     let aggregatedValue = 0;
     switch (aggregationType) {
       case 'sum':
-        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0), 0);
+        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0).toFixed(0), 0);
         break;
       case 'average':
-        aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0), 0) / filteredData.length;
+        aggregatedValue = (filteredData.reduce((acc, row) => acc + parseFloat(row[comparisonColumn] || 0), 0) / filteredData.length).toFixed(0);
         break;
       // Implement other aggregation types as needed
     }
 
-    return aggregatedValue;
+    return parseFloat(aggregatedValue);
   };
 
   const formatNumberWithCommas = (number) => {
@@ -242,7 +255,12 @@ function App() {
         </label>
 
         <label className='subtitle' style={{ color: 'white' }}>Filter Value:
-          <input className='dropdown' value={filterValue} onChange={e => setFilterValue(e.target.value)} />
+          <select className='dropdown' value={filterValue} onChange={e => setFilterValue(e.target.value)}>
+            <option value="">Select a value</option>
+            {distinctFilterValues.map(value => (
+              <option key={value} value={value}>{value}</option>
+            ))}
+          </select>
         </label>
       </div>
 
@@ -254,12 +272,33 @@ function App() {
         </select>
       </label>
 
+      <label className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}>
+        vs
+        <input
+          type="text"
+          value={comparisonValue}
+          onChange={(e) => setComparisonValue(e.target.value)}
+          style={{ fontSize: '24px', color: '#6b7280', border: '5px', borderColor: 'white', backgroundColor: 'transparent', outline: '2px' }}
+        />
+      </label>
+      <label className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}>
+        title
+      <input
+        className='subtitle'
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        style={{ fontSize: '32px', color: '#6b7280', margin: '0', border: 'none', backgroundColor: 'transparent', outline: 'none' }}
+      />
+      </label>
+      
+
 
 
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
-          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{cleanFilename}</h2>
+          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{title}</h2>
           {showHeroMetric && (
             <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
               <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>
@@ -269,6 +308,7 @@ function App() {
                 <i className={`nes-icon ${isComparisonPositive ? 'caret-up' : 'caret-down'}`}></i>
                 <span className='title' style={{ marginLeft: '8px' }}>{formatNumberWithCommas(Math.abs(comparisonResult).toFixed(0))}%</span>
               </div>
+              <p className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}> vs {comparisonValue} </p>
             </div>
           )}
         </div>
