@@ -30,7 +30,7 @@ function App() {
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
     '1.3.1 Messages p_d Per Year.csv',
-    '1.5 Messages Per Week.csv',
+    '1.5 Messages Per Week (1).csv',
     '1.6 Average Messages Per Day Of Week.csv'
     // Add more filenames as needed
   ]);
@@ -38,7 +38,11 @@ function App() {
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [colorMode, setColorMode] = useState('dynamic'); // 'dynamic', 'solid'
   const [selectedColorSet, setSelectedColorSet] = useState('BLUES'); // Default to 'BLUES'
-  const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // 'key' or 'indexValue'
+  // const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // 'key' or 'indexValue'
+  // Add new states for the column-based dynamic coloring mode and the selected column for coloring
+  const [dynamicColoringColumn, setDynamicColoringColumn] = useState('');
+  // Update the dynamicColoringMode state initialization to include the new mode
+  const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // Add 'columnValue' as an option later in the dropdown
 
 
   useEffect(() => {
@@ -87,7 +91,7 @@ function App() {
         keys={yColumns}
         indexBy={xColumn}
         // layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
-        layers={['grid', 'axes', 'bars', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSet={selectedColorSet} dynamicColoringMode={dynamicColoringMode} />, 'markers', 'legends', 'annotations']}
+        layers={['grid', 'axes', 'bars', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSet={selectedColorSet} dynamicColoringMode={dynamicColoringMode} columnName={dynamicColoringColumn} />, 'markers', 'legends', 'annotations']}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
         valueScale={{ type: 'linear' }}
@@ -198,7 +202,7 @@ function App() {
       <div>
         <label className='subtitle' style={{ color: 'white' }}>
           Color Mode:
-          <select className='dropdown' value={colorMode} onChange={e => setColorMode(e.target.value)}>
+          <select className='colors' value={colorMode} onChange={e => setColorMode(e.target.value)}>
             <option value="dynamic">Dynamic</option>
             <option value="solid">Solid</option>
           </select>
@@ -207,17 +211,28 @@ function App() {
           <>
             <label className='subtitle' style={{ color: 'white' }}>
               Dynamic Coloring Mode:
-              <select className='dropdown' value={dynamicColoringMode} onChange={e => setDynamicColoringMode(e.target.value)}>
+              <select className='colors' value={dynamicColoringMode} onChange={e => setDynamicColoringMode(e.target.value)}>
                 <option value="key">By Key</option>
                 <option value="indexValue">By Index Value</option>
+                <option value="columnValue">By Column Value</option> {/* Add this line */}
               </select>
             </label>
+            {dynamicColoringMode === 'columnValue' && ( // Add this block
+              <label className='subtitle' style={{ color: 'white' }}>
+                Select Column for Coloring:
+                <select className='colors' value={dynamicColoringColumn} onChange={e => setDynamicColoringColumn(e.target.value)}>
+                  {columnHeaders.map(header => (
+                    <option key={header} value={header}>{header}</option>
+                  ))}
+                </select>
+              </label>
+            )}
           </>
         )}
         {colorMode === 'solid' && (
           <label className='subtitle' style={{ color: 'white' }}>
             Select Color Set:
-            <select className='dropdown' value={selectedColorSet} onChange={e => setSelectedColorSet(e.target.value)}>
+            <select className='colors' value={selectedColorSet} onChange={e => setSelectedColorSet(e.target.value)}>
               {Object.keys(colorSets).map(key => (
                 <option key={key} value={key}>{key}</option>
               ))}
@@ -227,7 +242,7 @@ function App() {
       </div>
       <div>
         <label className='subtitle' style={{ color: 'white' }}>Column:
-          <select className='dropdown' value={selectedColumn} onChange={e => setSelectedColumn(e.target.value)}>
+          <select className='hero' value={selectedColumn} onChange={e => setSelectedColumn(e.target.value)}>
             {columnHeaders.map(header => (
               <option key={header} value={header}>{header}</option>
             ))}
@@ -235,19 +250,19 @@ function App() {
         </label>
 
         <label className='subtitle' style={{ color: 'white' }}>Aggregation:
-          <select className='dropdown' value={aggregationType} onChange={e => setAggregationType(e.target.value)}>
+          <select className='hero' value={aggregationType} onChange={e => setAggregationType(e.target.value)}>
             <option value="sum">Sum</option>
             <option value="average">Average</option>
             {/* Add more aggregation types as needed */}
           </select>
         </label>
 
-        <button className='dropdown' style={{}} onClick={toggleHeroMetric}>Toggle Hero Metric</button>
+        <button className='hero' style={{}} onClick={toggleHeroMetric}>Toggle Hero Metric</button>
       </div>
 
       <div>
         <label className='subtitle' style={{ color: 'white' }}>Filter Column:
-          <select className='dropdown' value={filterColumn} onChange={e => setFilterColumn(e.target.value)}>
+          <select className='filter' value={filterColumn} onChange={e => setFilterColumn(e.target.value)}>
             {columnHeaders.map(header => (
               <option key={header} value={header}>{header}</option>
             ))}
@@ -255,7 +270,7 @@ function App() {
         </label>
 
         <label className='subtitle' style={{ color: 'white' }}>Filter Value:
-          <select className='dropdown' value={filterValue} onChange={e => setFilterValue(e.target.value)}>
+          <select className='filter' value={filterValue} onChange={e => setFilterValue(e.target.value)}>
             <option value="">Select a value</option>
             {distinctFilterValues.map(value => (
               <option key={value} value={value}>{value}</option>
@@ -265,7 +280,7 @@ function App() {
       </div>
 
       <label className='subtitle' style={{ color: 'white' }}>Comparison Column:
-        <select className='dropdown' value={comparisonColumn} onChange={e => setComparisonColumn(e.target.value)}>
+        <select className='comparison' value={comparisonColumn} onChange={e => setComparisonColumn(e.target.value)}>
           {columnHeaders.map(header => (
             <option key={header} value={header}>{header}</option>
           ))}
@@ -283,15 +298,15 @@ function App() {
       </label>
       <label className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}>
         title
-      <input
-        className='subtitle'
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        style={{ fontSize: '32px', color: '#6b7280', margin: '0', border: 'none', backgroundColor: 'transparent', outline: 'none' }}
-      />
+        <input
+          className='subtitle'
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          style={{ fontSize: '32px', color: '#6b7280', margin: '0', border: 'none', backgroundColor: 'transparent', outline: 'none' }}
+        />
       </label>
-      
+
 
 
 

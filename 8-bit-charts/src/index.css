@@ -27,6 +27,66 @@ body {
   font-weight: bold; 
   font-size: 16px;
 }
+
+.data {
+  margin: 5px; 
+  padding: 10px 20px; 
+  background-color: #718096; 
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.colors {
+  margin: 5px; 
+  padding: 10px 20px; 
+  background-color: #10B981; 
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.hero {
+  margin: 5px; 
+  padding: 10px 20px; 
+  background-color: #F43F5E; 
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.filter {
+  margin: 5px; 
+  padding: 10px 20px; 
+  background-color: #7C3AED; 
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.comparison {
+  margin: 5px; 
+  padding: 10px 20px; 
+  background-color: #F97316; 
+  color: white; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  font-size: 16px;
+}
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 

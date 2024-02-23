@@ -8,12 +8,12 @@ export const colorSets = {
         lightColor: '#77A8F9',
         borderColor: '#0748B0',
     },
-      BLUES2: {
+    BLUES2: {
         mainColor: '#0476E2',
         shadowColor: '#095ED3',
         lightColor: '#4CB4FD',
         borderColor: '#17499E',
-      },
+    },
     GREENS: {
         mainColor: '#00CC3F',
         shadowColor: '#02AC45',
@@ -62,14 +62,31 @@ const assignColorSetsToIndexValues = (bars) => {
     indexValues.forEach((value, index) => {
         indexValueColorMapping[value] = colorSets[colorSetKeys[index % colorSetKeys.length]];
     });
-
     return indexValueColorMapping;
 };
+const assignColorSetsToColumnValues = (bars, columnName) => {
+    // Access the nested 'data' object
+    const columnValues = [...new Set(bars.map(bar => bar.data.data[columnName]))];
+    const colorSetKeys = Object.keys(colorSets);
+    const columnValueColorMapping = {};
 
-const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode }) => {
+    columnValues.forEach((value, index) => {
+        columnValueColorMapping[value] = colorSets[colorSetKeys[index % colorSetKeys.length]];
+    });
+
+    return columnValueColorMapping;
+};
+
+const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode, columnName }) => {
     let colorMapping;
     if (colorMode === 'dynamic') {
-        colorMapping = dynamicColoringMode === 'key' ? assignColorSetsToKeys(bars) : assignColorSetsToIndexValues(bars);
+        if (dynamicColoringMode === 'key') {
+            colorMapping = assignColorSetsToKeys(bars);
+        } else if (dynamicColoringMode === 'indexValue') {
+            colorMapping = assignColorSetsToIndexValues(bars);
+        } else if (dynamicColoringMode === 'columnValue' && columnName) {
+            colorMapping = assignColorSetsToColumnValues(bars, columnName);
+        }
     } else {
         // Use a solid color set for all bars
         const solidColorSet = colorSets[selectedColorSet];
@@ -79,18 +96,25 @@ const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode })
         }, {});
     }
 
-
-
     return (
         <g>
             {bars.map(bar => {
+                console.log(bar)
                 let colorSet;
                 if (colorMode === 'dynamic') {
-                    colorSet = dynamicColoringMode === 'key' ? colorMapping[bar.data.id] : colorMapping[bar.data.indexValue];
+                    if (dynamicColoringMode === 'key') {
+                        colorSet = colorMapping[bar.data.id];
+                    } else if (dynamicColoringMode === 'indexValue') {
+                        colorSet = colorMapping[bar.data.indexValue];
+                    } else if (dynamicColoringMode === 'columnValue' && columnName) {
+                        colorSet = colorMapping[bar.data.data[columnName]];
+                    }
                 } else {
                     colorSet = colorMapping[bar.data.id];
                 }
                 const { mainColor, shadowColor, lightColor, borderColor } = colorSet || colorSets.BLUES;
+                // console.log(bar.data.data[columnName])
+                console.log([columnName])
 
                 return (
                     <React.Fragment key={bar.key}>
