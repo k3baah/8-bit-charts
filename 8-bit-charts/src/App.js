@@ -61,7 +61,6 @@ function App() {
     <div style={{ height: 400 }}>
       <ResponsiveBar
         data={data}
-        // keys={[yColumn]}
         keys={yColumns}
         indexBy={xColumn}
         // layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
@@ -75,7 +74,6 @@ function App() {
       />
     </div>
   );
-
 
   const exportToPNG = () => {
     domToImage.toPng(containerRef.current, {
@@ -99,38 +97,44 @@ function App() {
 
     <div>
       <div>
-        <select value={filename} onChange={e => setFilename(e.target.value)}>
-          {availableFiles.map(file => (
-            <option key={file} value={file}>{file}</option>
-          ))}
-        </select>
+        <label className='subtitle' style = {{color:'white'}}>Data:
+          <select className='dropdown' value={filename} onChange={e => setFilename(e.target.value)}>
+            {availableFiles.map(file => (
+              <option key={file} value={file}>{file}</option>
+            ))}
+          </select>
+        </label>
 
-        <select value={xColumn} onChange={e => setXColumn(e.target.value)}>
-          {columnHeaders.map(header => (
-            <option key={header} value={header}>{header}</option>
-          ))}
-        </select>
+        <label className='subtitle' style = {{color:'white'}}>X Axis:
+          <select className='dropdown' value={xColumn} onChange={e => setXColumn(e.target.value)}>
+            {columnHeaders.map(header => (
+              <option key={header} value={header}>{header}</option>
+            ))}
+          </select>
+        </label>
 
-        <select multiple value={yColumns} onChange={e => setYColumns([...e.target.selectedOptions].map(option => option.value))}>
-          {columnHeaders.map(header => (
-            <option key={header} value={header}>{header}</option>
-          ))}
-        </select>
+        <label className='subtitle' style = {{color:'white'}}>Y Axis:
+          <select className='dropdown' value={yColumns} onChange={e => setYColumns(Array.from(e.target.selectedOptions).map(option => option.value))} multiple>
+            {columnHeaders.map(header => (
+              <option key={header} value={header}>{header}</option>
+            ))}
+          </select>
+        </label>
       </div>
 
       <div>
-  <label>
+  <label className='subtitle' style={{color:'white'}}>
     Color Mode:
-    <select value={colorMode} onChange={e => setColorMode(e.target.value)}>
+    <select className = 'dropdown' value={colorMode} onChange={e => setColorMode(e.target.value)}>
       <option value="dynamic">Dynamic</option>
       <option value="solid">Solid</option>
     </select>
   </label>
   {colorMode === 'dynamic' && (
     <>
-      <label>
+      <label className='subtitle' style={{color:'white'}}>
         Dynamic Coloring Mode:
-        <select value={dynamicColoringMode} onChange={e => setDynamicColoringMode(e.target.value)}>
+        <select className = 'dropdown' value={dynamicColoringMode} onChange={e => setDynamicColoringMode(e.target.value)}>
           <option value="key">By Key</option>
           <option value="indexValue">By Index Value</option>
         </select>
@@ -138,9 +142,9 @@ function App() {
     </>
   )}
   {colorMode === 'solid' && (
-    <label>
+    <label className='subtitle' style={{color:'white'}}>
       Select Color Set:
-      <select value={selectedColorSet} onChange={e => setSelectedColorSet(e.target.value)}>
+      <select className = 'dropdown' value={selectedColorSet} onChange={e => setSelectedColorSet(e.target.value)}>
         {Object.keys(colorSets).map(key => (
           <option key={key} value={key}>{key}</option>
         ))}

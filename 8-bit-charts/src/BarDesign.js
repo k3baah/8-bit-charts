@@ -8,12 +8,12 @@ export const colorSets = {
         lightColor: '#77A8F9',
         borderColor: '#0748B0',
     },
-    //   BLUES2: {
-    //     mainColor: '#0476E2',
-    //     shadowColor: '#095ED3',
-    //     lightColor: '#4CB4FD',
-    //     borderColor: '#17499E',
-    //   },
+      BLUES2: {
+        mainColor: '#0476E2',
+        shadowColor: '#095ED3',
+        lightColor: '#4CB4FD',
+        borderColor: '#17499E',
+      },
     GREENS: {
         mainColor: '#00CC3F',
         shadowColor: '#02AC45',
@@ -39,7 +39,6 @@ export const colorSets = {
         borderColor: '#362662',
     },
 };
-const currentColorSet = colorSets.YELLOWS;
 
 // Function to dynamically assign color sets to keys
 const assignColorSetsToKeys = (bars) => {
@@ -92,10 +91,6 @@ const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode })
                     colorSet = colorMapping[bar.data.id];
                 }
                 const { mainColor, shadowColor, lightColor, borderColor } = colorSet || colorSets.BLUES;
-                // const { mainColor, shadowColor, lightColor, borderColor } = keyColorMapping[bar.data.id];
-                // const { mainColor, shadowColor, lightColor, borderColor } = colorMapping[bar.data.id] || colorSets.BLUES;
-                // console.log(bar)
-
 
                 return (
                     <React.Fragment key={bar.key}>
