@@ -30,6 +30,7 @@ function App() {
   const [availableFiles, setAvailableFiles] = useState([
     '1.3 Messages Per Year.csv',
     '1.3.1 Messages p_d Per Year.csv',
+    '1.4 Messages per Month.csv',
     '1.5 Messages Per Week (1).csv',
     '1.6 Average Messages Per Day Of Week.csv'
     // Add more filenames as needed
@@ -38,6 +39,7 @@ function App() {
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [colorMode, setColorMode] = useState('dynamic'); // 'dynamic', 'solid'
   const [selectedColorSet, setSelectedColorSet] = useState('BLUES'); // Default to 'BLUES'
+  const [selectedColorSets, setSelectedColorSets] = useState(['BLUES']); // Default to 'BLUES'
   // const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // 'key' or 'indexValue'
   // Add new states for the column-based dynamic coloring mode and the selected column for coloring
   const [dynamicColoringColumn, setDynamicColoringColumn] = useState('');
@@ -84,20 +86,59 @@ function App() {
     }
   }, [filterColumn, data]);
 
+  // Handler for selecting color sets with order preservation
+  const handleColorSetSelection = (colorSet) => {
+    setSelectedColorSets(prevSelectedColorSets => {
+      // Check if the colorSet is already selected
+      if (prevSelectedColorSets.includes(colorSet)) {
+        // Remove the colorSet from the selection
+        return prevSelectedColorSets.filter(selectedColorSet => selectedColorSet !== colorSet);
+      } else {
+        // Add the colorSet to the selection, preserving order
+        return [...prevSelectedColorSets, colorSet];
+      }
+    });
+  };
+
   const MyResponsiveBar = () => (
     <div style={{ height: 400 }}>
       <ResponsiveBar
         data={data}
         keys={yColumns}
         indexBy={xColumn}
-        // layers={['grid', 'axes', 'bars', CustomLayer, 'markers', 'legends', 'annotations']}
-        layers={['grid', 'axes', 'bars', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSet={selectedColorSet} dynamicColoringMode={dynamicColoringMode} columnName={dynamicColoringColumn} />, 'markers', 'legends', 'annotations']}
+        layers={['grid', 'axes', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSets={selectedColorSets} dynamicColoringMode={dynamicColoringMode} columnName={dynamicColoringColumn} />, 'markers', 'legends', 'annotations']}
         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.3}
+        colors={selectedColorSets.map(set => colorSets[set].mainColor)}
         valueScale={{ type: 'linear' }}
         indexScale={{ type: 'band', round: true }}
         theme={theme}
         axisLeft={null}
+        groupMode='grouped'
+        legends={[
+          {
+            dataFrom: 'keys',
+            anchor: 'bottom-right',
+            direction: 'column',
+            justify: false,
+            translateX: 120,
+            translateY: 0,
+            itemsSpacing: 2,
+            itemWidth: 100,
+            itemHeight: 20,
+            itemDirection: 'left-to-right',
+            itemOpacity: 0.85,
+            symbolSize: 20,
+            effects: [
+              {
+                on: 'hover',
+                style: {
+                  itemOpacity: 1
+                }
+              }
+            ]
+          }
+        ]}
       />
     </div>
   );
@@ -216,6 +257,16 @@ function App() {
                 <option value="indexValue">By Index Value</option>
                 <option value="columnValue">By Column Value</option> {/* Add this line */}
               </select>
+            </label>
+            <label className='subtitle' style={{ color: 'white' }}>
+              Select Color Sets:
+              <div className='colors'>
+                {Object.keys(colorSets).map(key => (
+                  <div key={key} onClick={() => handleColorSetSelection(key)} style={{ cursor: 'pointer', backgroundColor: selectedColorSets.includes(key) ? '#ccc' : 'transparent' }}>
+                    {key}
+                  </div>
+                ))}
+              </div>
             </label>
             {dynamicColoringMode === 'columnValue' && ( // Add this block
               <label className='subtitle' style={{ color: 'white' }}>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const val = 16;
+const val = 8;
 export const colorSets = {
     BLUES: {
         mainColor: '#3b82f6',
@@ -8,12 +8,19 @@ export const colorSets = {
         lightColor: '#77A8F9',
         borderColor: '#0748B0',
     },
-    BLUES2: {
-        mainColor: '#0476E2',
-        shadowColor: '#095ED3',
-        lightColor: '#4CB4FD',
-        borderColor: '#17499E',
+
+    GRAYS : {
+        mainColor: '#879EC8',
+        shadowColor: '#5D6E9C',
+        lightColor: '#9DB1DB',
+        borderColor: '#2E2D32',
     },
+    // BLUES2: {
+    //     mainColor: '#0476E2',
+    //     shadowColor: '#095ED3',
+    //     lightColor: '#4CB4FD',
+    //     borderColor: '#17499E',
+    // },
     GREENS: {
         mainColor: '#00CC3F',
         shadowColor: '#02AC45',
@@ -41,13 +48,13 @@ export const colorSets = {
 };
 
 // Function to dynamically assign color sets to keys
-const assignColorSetsToKeys = (bars) => {
+const assignColorSetsToKeys = (bars, selectedColorSets) => {
     const keys = [...new Set(bars.map(bar => bar.data.id))];
-    const colorSetKeys = Object.keys(colorSets);
     const keyColorMapping = {};
 
     keys.forEach((key, index) => {
-        keyColorMapping[key] = colorSets[colorSetKeys[index % colorSetKeys.length]];
+        const colorSetKey = selectedColorSets[index % selectedColorSets.length];
+        keyColorMapping[key] = colorSets[colorSetKey];
     });
 
     return keyColorMapping;
@@ -77,11 +84,11 @@ const assignColorSetsToColumnValues = (bars, columnName) => {
     return columnValueColorMapping;
 };
 
-const CustomLayer = ({ bars, colorMode, selectedColorSet, dynamicColoringMode, columnName }) => {
+const CustomLayer = ({ bars, colorMode, selectedColorSet, selectedColorSets, dynamicColoringMode, columnName }) => {
     let colorMapping;
     if (colorMode === 'dynamic') {
         if (dynamicColoringMode === 'key') {
-            colorMapping = assignColorSetsToKeys(bars);
+            colorMapping = assignColorSetsToKeys(bars, selectedColorSets);
         } else if (dynamicColoringMode === 'indexValue') {
             colorMapping = assignColorSetsToIndexValues(bars);
         } else if (dynamicColoringMode === 'columnValue' && columnName) {

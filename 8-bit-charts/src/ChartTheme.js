@@ -16,7 +16,7 @@ const theme = {
       "legend": {
         "text": {
           "fontSize": 24,
-          "fill": "transparent",
+          "fill": "#fff",
           "outlineWidth": 0,
           "outlineColor": "transparent"
         }
@@ -45,16 +45,17 @@ const theme = {
       "title": {
         "text": {
           "fontSize": 11,
-          "fill": "#333333",
+          "fill": "#fff",
           "outlineWidth": 0,
           "outlineColor": "transparent"
         }
       },
       "text": {
         "fontSize": 11,
-        "fill": "#333333",
+        "fill": "#fff",
         "outlineWidth": 0,
-        "outlineColor": "transparent"
+        "outlineColor": "transparent",
+        "fontFamily": '"Space Mono", monospace'
       },
       "ticks": {
         "line": {},
