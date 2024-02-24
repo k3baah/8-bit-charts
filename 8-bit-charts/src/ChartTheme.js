@@ -1,10 +1,11 @@
 const theme = {
     "background": "transparent",
     "text": {
-      "fontSize": 24,
-      "fill": "#333333",
+      "fontSize": 12,
+      "fill": "#fff",
       "outlineWidth": 0,
-      "outlineColor": "transparent"
+      "outlineColor": "transparent",
+      "fontFamily": '"Space Mono", monospace'
     },
     "axis": {
       "domain": {

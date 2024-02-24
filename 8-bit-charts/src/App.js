@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import BarChart from './BarChart';
+import { BarChart } from './BarChart';
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsiveCalendar } from '@nivo/calendar';
+import { ResponsiveHeatMap } from '@nivo/heatmap';
 import domToImage from 'dom-to-image';
 import CustomLayer from './BarDesign';
 import theme from './ChartTheme'
@@ -41,6 +42,7 @@ function App() {
     '1.4 Messages per Month.csv',
     '1.5 Messages Per Week (1).csv',
     '1.6 Average Messages Per Day Of Week.csv',
+    '1.6.2 Most Active Day.csv',
     '1.7 Messages Per Hour.csv',
     '2.1 Messages Per Person Per Year .csv',
     '2.3 Average Messages Per Person Per Day.csv',
@@ -63,6 +65,7 @@ function App() {
   const [showAxisLeft, setShowAxisLeft] = useState(true); // Default is true to show the left axis
 
   const [calendarData, setCalendarData] = useState([]);
+  const [heatmapData, setHeatmapData] = useState([]);
 
 
   useEffect(() => {
@@ -95,30 +98,6 @@ function App() {
     loadCsvData();
   }, [filename, xColumn, yColumns]);
 
-  // New useEffect hook for processing data for the calendar
-  useEffect(() => {
-    const loadCsvDataForCalendar = () => {
-      fetch(`/data/${filename}`)
-        .then(response => response.text())
-        .then(csvText => {
-          Papa.parse(csvText, {
-            complete: (results) => {
-              // Transform the data into the desired format for the calendar
-              const formattedDataForCalendar = results.data.map(row => ({
-                day: row.date, // Assuming your CSV has a 'date' column for dates
-                value: parseInt(row.msgs, 10) // Assuming 'msgs' is the column for message counts
-              }));
-              setCalendarData(formattedDataForCalendar);
-            },
-            header: true,
-          });
-        })
-        .catch(err => console.error('Error loading CSV for calendar:', err));
-    };
-
-    loadCsvDataForCalendar();
-  }, [filename]); // This effect runs wh
-
   const [distinctFilterValues, setDistinctFilterValues] = useState([]);
 
   useEffect(() => {
@@ -143,7 +122,7 @@ function App() {
   };
 
   const MyResponsiveBar = () => (
-    <div style={{ height: 600 }}>
+    <div style={{ height: 600 , width:2000}}>
       <ResponsiveBar
         data={data}
         keys={yColumns}
@@ -203,7 +182,7 @@ function App() {
       .then((dataUrl) => {
         // Create a link to download the image
         const link = document.createElement('a');
-        link.download = `${filename}.png`;
+        link.download = `${title}.png`;
         link.href = dataUrl;
         link.click();
       })
@@ -261,18 +240,164 @@ function App() {
   const comparisonResult = ((heroMetric - comparisonMetric) / comparisonMetric) * 100;
   const isComparisonPositive = comparisonResult >= 0;
 
+  const transformDataForHeatmap = (csvData) => {
+    // Assuming csvData is an array of objects where each object represents a row in the CSV
+    // And the first row (headers) contains the names, which are used as IDs
+  
+    // Initialize an empty array to hold the transformed data
+    let transformedData = [];
+  
+    // Check if csvData is valid
+    if (csvData && csvData.length > 0) {
+      // Get all keys (column names) except for the first two ('month', 'month_name')
+      const personNames = Object.keys(csvData[0]).slice(1);
+  
+      // Iterate over each person to create their data structure
+      personNames.forEach(personName => {
+        const personData = {
+          id: personName,
+          data: csvData.map(monthData => ({
+            x: monthData.hour, // Using month_name for x
+            y: +monthData[personName] || 0 // Convert to number, default to 0 if undefined
+          }))
+        };
+        transformedData.push(personData);
+      });
+    }
+  
+    return transformedData;
+  };
+
+  useEffect(() => {
+    const loadCsvDataForHeatmap = () => {
+      fetch(`/data/2.6 Average Messages Per Hour of Day (1).csv`)
+        .then(response => response.text())
+        .then(csvText => {
+          Papa.parse(csvText, {
+            complete: (results) => {
+              // Assuming the first row contains headers
+              const headers = results.meta.fields;
+  
+              // Process the data rows to include all columns dynamically
+              const formattedData = results.data.map(row => {
+                const rowData = {};
+                headers.forEach(header => {
+                  rowData[header] = row[header];
+                });
+                return rowData;
+              });
+  
+              // Transform the data for the heatmap
+              const transformedHeatmapData = transformDataForHeatmap(formattedData);
+              setHeatmapData(transformedHeatmapData);
+            },
+            header: true,
+          });
+        })
+        .catch(err => console.error('Error loading CSV for heatmap:', err));
+    };
+  
+    loadCsvDataForHeatmap();
+  }, [filename]); // Dependency array to re-run the effect when filename changes
+
+  const MyResponsiveHeatMap = ({ heatmapData /* see data tab */ }) => (
+    <ResponsiveHeatMap
+        data={heatmapData}
+        margin={{ top: 60, right: 90, bottom: 60, left: 200 }}
+        theme = {theme}
+        // enableLabels={false}
+        valueFormat=".2f"
+        axisTop={{
+            tickSize: 5,
+            tickPadding: 5,
+            tickRotation:0,
+            legend: '',
+            legendOffset: 46,
+            truncateTickAt: 0
+        }}
+        
+        axisLeft={{
+            tickSize: 5,
+            tickPadding: 20,
+            tickRotation: 0,
+            // legend: 'country',
+            legendPosition: 'middle',
+            legendOffset: 0,
+            truncateTickAt: 0
+        }}
+        // colors={['#B1CDFC','#75A6FA', '#4E8CF9', '#2673F7', '#3b82f6', '#2877F6', '#0748B0']}
+        colors={{
+            type: 'sequential',
+            scheme: 'blues',
+            // minValue: 0,
+            // maxValue: 2500
+        }}
+        emptyColor="#555555"
+        legends={[
+            {
+                anchor: 'bottom',
+                translateX: 0,
+                translateY: 30,
+                length: 400,
+                thickness: 8,
+                direction: 'row',
+                tickPosition: 'after',
+                tickSize: 3,
+                tickSpacing: 4,
+                tickOverlap: false,
+                tickFormat: '>-.2s',
+                title: 'Value →',
+                titleAlign: 'start',
+                titleOffset: 4
+            }
+        ]}
+    />
+)
+
+useEffect(() => {
+  const loadCsvDataForCalendar = () => {
+    fetch(`/data/1.x Messages Per Day.csv`)
+      .then(response => response.text())
+      .then(csvText => {
+        Papa.parse(csvText, {
+          complete: (results) => {
+            // Ensure results.data is an array and has content before mapping
+            if (Array.isArray(results.data) && results.data.length > 0) {
+              const formattedDataForCalendar = results.data.map(row => ({
+                day: row.date, // Assuming your CSV has a 'date' column for dates
+                value: parseInt(row.msgs, 10) // Assuming 'msgs' is the column for message counts
+              }));
+              setCalendarData(formattedDataForCalendar);
+            }
+          },
+          header: true,
+        });
+      })
+      .catch(err => console.error('Error loading CSV for calendar:', err));
+  };
+
+  loadCsvDataForCalendar();
+}, [filename]); // Dependency array to re-run the effect when filename changes
+
+// Ensure calendarData is passed correctly to MyResponsiveCalendar
+// This part seems correct as per your snippet, assuming calendarData state is correctly set up and updated
+
   const MyResponsiveCalendar = ({ calendarData }) => (
       <ResponsiveCalendar
         data={calendarData}
         from="2023-01-01"
         to="2023-12-31"
         emptyColor="#eeeeee"
-        colors={['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
-        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+        // colors={['#61cdbb', '#97e3d5', '#026F49', '#00CC3F']}
+        colors={['#B1CDFC','#75A6FA', '#4E8CF9', '#2673F7', '#3b82f6', '#2877F6', '#0748B0']}
+        margin={{ top: 0, right: 40, bottom: 40, left: 40 }}
         yearSpacing={40}
-        monthBorderColor="#ffffff"
+        monthBorderColor="transparent"
         dayBorderWidth={2}
-        dayBorderColor="#ffffff"
+        dayBorderColor="#1E1E1E"
+        // daySpacing={1}
+        minValue={'auto'}
+        theme = {theme}
         legends={[
           {
             anchor: 'bottom-right',
@@ -288,7 +413,7 @@ function App() {
       />
   )
 
-  console.log(calendarData)
+  console.log(heatmapData)
   return (
 
     <div>
@@ -482,25 +607,28 @@ function App() {
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* <h2 className='subtitle' style={{ fontSize: '32px', padding: '0px', color: 'white', margin: '0' }}>Messages Sent</h2> */}
-          <h2 className='subtitle' style={{ fontSize: '32px', color: '#6b7280', margin: '0' }}>{title}</h2>
+          <h2 className='subtitle' style={{ fontSize: '32px', color: '#94a3b8', margin: '0' }}>{title}</h2>
           {showHeroMetric && (
             <div style={{ display: 'flex', alignItems: 'center', color: 'white' }}>
               <h2 className='title' style={{ fontSize: '64px', paddingTop: '32px', margin: '0' }}>
                 {formatNumberWithCommas(heroMetric)}
               </h2>
-              <div style={{ fontSize: '32px', color: isComparisonPositive ? 'green' : 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
+              {/* <div style={{ fontSize: '32px', color: isComparisonPositive ? 'green' : 'red', display: 'flex', alignItems: 'center', padding: '24px' }}>
                 <i className={`nes-icon ${isComparisonPositive ? 'caret-up' : 'caret-down'}`}></i>
                 <span className='title' style={{ marginLeft: '8px' }}>{formatNumberWithCommas(Math.abs(comparisonResult).toFixed(0))}%</span>
-              </div>
-              <p className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}> vs {comparisonValue} </p>
+              </div> */}
+              <p className='subtitle' style={{ color: '#6b7280', fontSize: '24px' }}>  {comparisonValue} </p>
             </div>
           )}
+          <p className='subtitle' style={{ color: '#6b7280', fontSize: '32px' }}>  Messages </p>
         </div>
-        <div style={{ paddingTop: '120px' }}><MyResponsiveBar /></div>
+        <div style={{ paddingTop: '120px'}}><MyResponsiveBar /></div>
         {/* <div style={{ paddingTop: '120px' }}><DefaultResponsiveBar /></div> */}
+        {/* <div style={{ height: '1000px', width:'2000px'}}>{heatmapData.length > 0 && <MyResponsiveHeatMap heatmapData={heatmapData} />}</div> */}
+        {/* <div style={{ height: '600px' }}>{calendarData.length > 0 && <MyResponsiveCalendar calendarData={calendarData} />}</div> */}
       </div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
-      <div><MyResponsiveCalendar /></div>
+      {/* <div style={{ height: '600px' }}>{calendarData.length > 0 && <MyResponsiveCalendar calendarData={calendarData} />}</div> */}
     </div>
   );
 }
