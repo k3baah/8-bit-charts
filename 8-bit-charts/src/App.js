@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+import BarChart from './BarChart';
 import { ResponsiveBar } from '@nivo/bar';
+import { ResponsiveCalendar } from '@nivo/calendar';
 import domToImage from 'dom-to-image';
 import CustomLayer from './BarDesign';
 import theme from './ChartTheme'
@@ -15,6 +16,12 @@ function App() {
   const [filename, setFilename] = useState('1.3 Messages Per Year.csv'); // Default filename
   const [xColumn, setXColumn] = useState('year'); // Default x-axis column
   const [yColumns, setYColumns] = useState(['message_count']); // Default y-axis column
+  const initialLabelVisibility = yColumns.reduce((acc, key) => {
+    acc[key] = true; // Start with all labels visible
+    return acc;
+  }, {});
+
+  const [labelVisibility, setLabelVisibility] = useState(initialLabelVisibility);
   const [showHeroMetric, setShowHeroMetric] = useState(false); // State to toggle hero metric
   const [selectedColumn, setSelectedColumn] = useState(''); // State for selected column
   const [aggregationType, setAggregationType] = useState('sum'); // State for aggregation type ('sum', 'average', etc.)
@@ -28,11 +35,17 @@ function App() {
   const [title, setTitle] = useState('');
 
   const [availableFiles, setAvailableFiles] = useState([
+    '1.x Messages Per Day.csv',
     '1.3 Messages Per Year.csv',
     '1.3.1 Messages p_d Per Year.csv',
     '1.4 Messages per Month.csv',
     '1.5 Messages Per Week (1).csv',
-    '1.6 Average Messages Per Day Of Week.csv'
+    '1.6 Average Messages Per Day Of Week.csv',
+    '1.7 Messages Per Hour.csv',
+    '2.1 Messages Per Person Per Year .csv',
+    '2.3 Average Messages Per Person Per Day.csv',
+    '3.0.2 Reacts by type (1).csv',
+    '3.2 React Received Histogram Per Person (1).csv',
     // Add more filenames as needed
   ]);
 
@@ -45,6 +58,11 @@ function App() {
   const [dynamicColoringColumn, setDynamicColoringColumn] = useState('');
   // Update the dynamicColoringMode state initialization to include the new mode
   const [dynamicColoringMode, setDynamicColoringMode] = useState('key'); // Add 'columnValue' as an option later in the dropdown
+
+  const [showChartLabels, setShowChartLabels] = useState(true); // Default is true to show labels
+  const [showAxisLeft, setShowAxisLeft] = useState(true); // Default is true to show the left axis
+
+  const [calendarData, setCalendarData] = useState([]);
 
 
   useEffect(() => {
@@ -77,6 +95,30 @@ function App() {
     loadCsvData();
   }, [filename, xColumn, yColumns]);
 
+  // New useEffect hook for processing data for the calendar
+  useEffect(() => {
+    const loadCsvDataForCalendar = () => {
+      fetch(`/data/${filename}`)
+        .then(response => response.text())
+        .then(csvText => {
+          Papa.parse(csvText, {
+            complete: (results) => {
+              // Transform the data into the desired format for the calendar
+              const formattedDataForCalendar = results.data.map(row => ({
+                day: row.date, // Assuming your CSV has a 'date' column for dates
+                value: parseInt(row.msgs, 10) // Assuming 'msgs' is the column for message counts
+              }));
+              setCalendarData(formattedDataForCalendar);
+            },
+            header: true,
+          });
+        })
+        .catch(err => console.error('Error loading CSV for calendar:', err));
+    };
+
+    loadCsvDataForCalendar();
+  }, [filename]); // This effect runs wh
+
   const [distinctFilterValues, setDistinctFilterValues] = useState([]);
 
   useEffect(() => {
@@ -101,30 +143,39 @@ function App() {
   };
 
   const MyResponsiveBar = () => (
-    <div style={{ height: 400 }}>
+    <div style={{ height: 600 }}>
       <ResponsiveBar
         data={data}
         keys={yColumns}
         indexBy={xColumn}
-        layers={['grid', 'axes', props => <CustomLayer {...props} colorMode={colorMode} selectedColorSets={selectedColorSets} dynamicColoringMode={dynamicColoringMode} columnName={dynamicColoringColumn} />, 'markers', 'legends', 'annotations']}
-        margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+        layers={['grid', 'axes', props => <CustomLayer {...props} labelVisibility={labelVisibility} colorMode={colorMode} selectedColorSets={selectedColorSets} dynamicColoringMode={dynamicColoringMode} columnName={dynamicColoringColumn} showChartLabels={showChartLabels} />, 'markers', 'legends', 'annotations']}
+        margin={{ top: 50, right: 170, bottom: 75, left: 120 }}
         padding={0.3}
         colors={selectedColorSets.map(set => colorSets[set].mainColor)}
         valueScale={{ type: 'linear' }}
         indexScale={{ type: 'band', round: true }}
         theme={theme}
-        axisLeft={null}
+        axisLeft={showAxisLeft ? { tickSize: 5, tickPadding: 5, tickRotation: 0, legend: '', legendPosition: 'middle', legendOffset: -40 } : null}
+        axisBottom={{
+          tickSize: 10,
+          tickPadding: 5,
+          // tickRotation: -20, // Rotate ticks by -45 degrees
+          legendOffset: 50,
+          // itemHeight: 100,
+          // symbolSize: 20,
+        }}
         groupMode='grouped'
         legends={[
           {
             dataFrom: 'keys',
             anchor: 'bottom-right',
+            // anchor: 'top-right',
             direction: 'column',
             justify: false,
             translateX: 120,
             translateY: 0,
             itemsSpacing: 2,
-            itemWidth: 100,
+            itemWidth: 110,
             itemHeight: 20,
             itemDirection: 'left-to-right',
             itemOpacity: 0.85,
@@ -160,7 +211,6 @@ function App() {
         console.error('Error exporting the chart:', error);
       });
   };
-  const cleanFilename = filename.replace(/^\d+\.\d+\s+|\.\w+$/g, '');
 
   const calculateHeroMetric = () => {
     let filteredData = data;
@@ -175,7 +225,7 @@ function App() {
         aggregatedValue = filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0).toFixed(0);
         break;
       case 'average':
-        aggregatedValue = (filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0) / filteredData.length).toFixed(0);
+        aggregatedValue = (filteredData.reduce((acc, row) => acc + parseFloat(row[selectedColumn] || 0), 0) / filteredData.length).toFixed(2);
         break;
       // Implement other aggregation types as needed
     }
@@ -211,6 +261,34 @@ function App() {
   const comparisonResult = ((heroMetric - comparisonMetric) / comparisonMetric) * 100;
   const isComparisonPositive = comparisonResult >= 0;
 
+  const MyResponsiveCalendar = ({ calendarData }) => (
+      <ResponsiveCalendar
+        data={calendarData}
+        from="2023-01-01"
+        to="2023-12-31"
+        emptyColor="#eeeeee"
+        colors={['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
+        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+        yearSpacing={40}
+        monthBorderColor="#ffffff"
+        dayBorderWidth={2}
+        dayBorderColor="#ffffff"
+        legends={[
+          {
+            anchor: 'bottom-right',
+            direction: 'row',
+            translateY: 36,
+            itemCount: 4,
+            itemWidth: 42,
+            itemHeight: 36,
+            itemsSpacing: 14,
+            itemDirection: 'right-to-left'
+          }
+        ]}
+      />
+  )
+
+  console.log(calendarData)
   return (
 
     <div>
@@ -357,9 +435,49 @@ function App() {
           style={{ fontSize: '32px', color: '#6b7280', margin: '0', border: 'none', backgroundColor: 'transparent', outline: 'none' }}
         />
       </label>
-
-
-
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <label className='subtitle' style={{ color: 'white' }}>
+          Show Chart Labels:
+          <input
+            type="checkbox"
+            checked={Object.values(labelVisibility).every(Boolean)} // "All" is checked if all keys are true
+            onChange={(e) => {
+              const newVisibility = Object.keys(labelVisibility).reduce((acc, key) => {
+                acc[key] = e.target.checked; // Set all keys to the checkbox's checked state
+                return acc;
+              }, {});
+              setLabelVisibility(newVisibility);
+            }}
+            style={{ marginLeft: '8px' }}
+          /> All
+        </label>
+        {yColumns.map((key) => (
+          <label key={key} className='subtitle' style={{ color: 'white', display: 'block' }}>
+            <input
+              type="checkbox"
+              checked={labelVisibility[key]}
+              onChange={() => {
+                setLabelVisibility((prev) => ({
+                  ...prev,
+                  [key]: !prev[key],
+                }));
+              }}
+              style={{ marginLeft: '8px' }}
+            /> {key}
+          </label>
+        ))}
+      </div>
+      <div>
+        <label className='subtitle' style={{ color: 'white' }}>
+          Show Left Axis:
+          <input
+            type="checkbox"
+            checked={showAxisLeft}
+            onChange={() => setShowAxisLeft(!showAxisLeft)}
+            style={{ marginLeft: '8px' }}
+          />
+        </label>
+      </div>
 
       <div ref={containerRef} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -382,6 +500,7 @@ function App() {
         {/* <div style={{ paddingTop: '120px' }}><DefaultResponsiveBar /></div> */}
       </div>
       <button style={{ margin: '30px', padding: '10px 20px', backgroundColor: '#007BFF', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }} onClick={exportToPNG}>Export as PNG</button>
+      <div><MyResponsiveCalendar /></div>
     </div>
   );
 }

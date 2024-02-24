@@ -9,7 +9,7 @@ export const colorSets = {
         borderColor: '#0748B0',
     },
 
-    GRAYS : {
+    GRAYS: {
         mainColor: '#879EC8',
         shadowColor: '#5D6E9C',
         lightColor: '#9DB1DB',
@@ -84,7 +84,7 @@ const assignColorSetsToColumnValues = (bars, columnName) => {
     return columnValueColorMapping;
 };
 
-const CustomLayer = ({ bars, colorMode, selectedColorSet, selectedColorSets, dynamicColoringMode, columnName }) => {
+const CustomLayer = ({ bars, labelVisibility, colorMode, selectedColorSet, selectedColorSets, dynamicColoringMode, columnName, showChartLabels }) => {
     let colorMapping;
     if (colorMode === 'dynamic') {
         if (dynamicColoringMode === 'key') {
@@ -189,14 +189,16 @@ const CustomLayer = ({ bars, colorMode, selectedColorSet, selectedColorSets, dyn
                             height={val} // Height of the edge
                             fill={shadowColor}
                         />
-                        <text
-                            x={bar.x + bar.width / 2}
-                            y={bar.y - 25} // Adjusted to place the text just above the bar
-                            textAnchor="middle"
-                            style={{ fill: '#fff', fontFamily: '"Press Start 2P"', fontSize: '16px' }} // Ensure the fill color makes the text visible
-                        >
-                            {parseFloat(bar.data.formattedValue).toFixed(0)}
-                        </text>
+                        {labelVisibility[bar.data.id] && (
+                            <text
+                                x={bar.x + bar.width / 2}
+                                y={bar.y - 25}
+                                textAnchor="middle"
+                                style={{ fill: '#fff', fontFamily: '"Press Start 2P"', fontSize: '16px' }}
+                            >
+                                {parseFloat(bar.data.formattedValue).toFixed(0)}
+                            </text>
+                        )}
                     </React.Fragment>
                 );
             })}
