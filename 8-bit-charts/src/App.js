@@ -1,13 +1,14 @@
 import React from 'react';
-import Button from '@mui/material/Button';
+import { Button } from 'antd';
+// import 'antd/dist/antd.css';
 
 function App() {
   return (
-    <div>
-      <Button variant="contained" color="primary">
-        Hello World
-      </Button>
-    </div>
+  <div className="App">
+    <h1>Hello World</h1>
+    <Button type="primary">Primary Button</Button>
+  </div>
+
   );
 }
 
