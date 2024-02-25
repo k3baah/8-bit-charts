@@ -1,6 +1,6 @@
 import React from 'react';
 
-const val = 8;
+const val = 4;
 export const colorSets = {
     BLUES: {
         mainColor: '#3b82f6',
@@ -191,9 +191,9 @@ const CustomLayer = ({ bars, labelVisibility, colorMode, selectedColorSet, selec
                         />
                         {labelVisibility[bar.data.id] && (
                             <text
-                                x={bar.x + bar.width / 2}
-                                y={bar.y - 25}
-                                textAnchor="middle"
+                                x={bar.x + bar.width + 25} // Adjusted to position to the right of the bar
+                                y={bar.y + bar.height / 1.5} // Centered vertically on the bar
+                                textAnchor="start" // Adjusted anchor to start to align text to the right of the bar
                                 style={{ fill: '#fff', fontFamily: '"Press Start 2P"', fontSize: '16px' }}
                             >
                                 {parseFloat(bar.data.formattedValue).toFixed(0)}
