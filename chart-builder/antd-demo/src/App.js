@@ -11,12 +11,17 @@ const App = () => {
   return (
     <div>
       <Navbar setCurrentConfig={setCurrentConfig} />
-      <div className='mx-6 my-6'>
-        {currentConfig === 'data' && <DataConfig />}
-      </div>
-      {currentConfig === 'charts' && <ChartConfig />}
-      {currentConfig === 'colours' && <ColorConfig />}
-      <ChartCanvas />
+      {currentConfig === 'data' ? (
+        <div className='mx-6 my-6'>
+          <DataConfig />
+        </div>
+      ) : (
+        <>
+          {currentConfig === 'charts' && <ChartConfig />}
+          {currentConfig === 'colours' && <ColorConfig />}
+          <ChartCanvas />
+        </>
+      )}
     </div>
   );
 };

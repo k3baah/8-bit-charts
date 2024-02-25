@@ -1,6 +1,10 @@
 import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
+import { Space, Table, Tag } from 'antd';
+import { Divider } from 'antd';
 import { message, Upload } from 'antd';
+import { Segmented } from 'antd';
+
 const { Dragger } = Upload;
 const props = {
     name: 'file',
@@ -21,8 +25,50 @@ const props = {
         console.log('Dropped files', e.dataTransfer.files);
     },
 };
+
+const Demo = () => (
+    <Segmented
+        options={['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']}
+        onChange={(value) => {
+            console.log(value); // string
+        }}
+    />
+);
+
+const dataSource = [
+    {
+        key: '1',
+        name: 'Mike',
+        age: 32,
+        address: '10 Downing Street',
+    },
+    {
+        key: '2',
+        name: 'John',
+        age: 42,
+        address: '10 Downing Street',
+    },
+];
+
+const columns = [
+    {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+    },
+    {
+        title: 'Age',
+        dataIndex: 'age',
+        key: 'age',
+    },
+    {
+        title: 'Address',
+        dataIndex: 'address',
+        key: 'address',
+    },
+];
 const DataConfig = () => (
-    <div className ='m6'>
+    <div className='m6'>
         <Dragger {...props}>
             <p className="ant-upload-drag-icon">
                 <InboxOutlined />
@@ -32,6 +78,14 @@ const DataConfig = () => (
                 Support for a single or bulk upload.
             </p>
         </Dragger>
-    </div>
+        <Divider />
+        <div className='mt-6'>
+            <Demo />
+        </div>
+        <div className='mt-6'>
+            <Table dataSource={dataSource} columns={columns} />
+        </div>
+    </div >
+
 );
 export default DataConfig;
