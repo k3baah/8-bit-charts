@@ -3,7 +3,7 @@ import { Flex } from 'antd';
 
 const ChartCanvas = () => {
   return (
-    <div className ='mx-6 min-h-[50vh] rounded-md border border-blue-400'>
+    <div className ='mx-6 mt-12 min-h-[75vh] rounded-md border border-slate-300'>
       <Flex>
         
         hi

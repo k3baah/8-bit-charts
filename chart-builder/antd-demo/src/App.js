@@ -10,7 +10,7 @@ const App = () => {
 
   return (
     <div>
-      <Navbar setCurrentConfig={setCurrentConfig} />
+      <Navbar currentConfig={currentConfig} setCurrentConfig={setCurrentConfig} />
       {currentConfig === 'data' ? (
         <div className='mx-6 my-6'>
           <DataConfig />

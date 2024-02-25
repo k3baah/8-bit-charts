@@ -26,8 +26,8 @@ const items = [
 ];
 
 
-const Navbar = ({ setCurrentConfig }) => { // Use destructuring to get setCurrentConfig from props
-  return <Menu onClick={(e) => setCurrentConfig(e.key)} selectedKeys={[items[0].key]} mode="horizontal" items={items} />;
+const Navbar = ({ currentConfig, setCurrentConfig }) => { // Use destructuring to get setCurrentConfig from props
+  return <Menu onClick={(e) => setCurrentConfig(e.key)} selectedKeys={[currentConfig]} mode="horizontal" items={items} />;
 };
 
 export default Navbar;
