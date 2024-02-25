@@ -4,7 +4,7 @@ import { Menu } from 'antd';
 
 const items = [
   {
-    label: 'Data',
+    label:  'Data',
     key: 'data',
     icon: <BorderlessTableOutlined />,
   },
@@ -26,9 +26,8 @@ const items = [
 ];
 
 const Navbar = () => {
-  const [current, setCurrent] = useState('data'); // Changed default state to 'data' to match the keys
+  const [current, setCurrent] = useState('data');
   const onClick = (e) => {
-    console.log('click ', e);
     setCurrent(e.key);
   };
 
