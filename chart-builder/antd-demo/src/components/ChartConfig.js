@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChartOutlined, PieChartOutlined, LineChartOutlined, HeatMapOutlined, CalendarOutlined, TableOutlined, BorderOutlined, BuildOutlined, EditOutlined, SignatureOutlined } from '@ant-design/icons';
+import { BarChartOutlined, PieChartOutlined, LineChartOutlined, HeatMapOutlined, CalendarOutlined, TableOutlined, DotChartOutlined, BorderOutlined, BuildOutlined, EditOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Flex, Button, Select } from 'antd';
 
 const ChartConfig = () => {
@@ -12,6 +12,7 @@ const ChartConfig = () => {
             <Button icon={<BarChartOutlined />}>Bar Chart</Button>
             <Button icon={<PieChartOutlined />}>Pie Chart</Button>
             <Button icon={<LineChartOutlined />}>Line Chart</Button>
+            <Button icon={<DotChartOutlined />}>Scatter Chart</Button>
             <Button icon={<HeatMapOutlined />}>Heatmap</Button>
             <Button icon={<CalendarOutlined />}>Calendar</Button>
             <Button icon={<TableOutlined />}>Table</Button>

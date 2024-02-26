@@ -3,6 +3,7 @@ import Navbar from './components/NavBar';
 import DataConfig from './components/DataConfig';
 import ChartConfig from './components/ChartConfig';
 import ColorConfig from './components/ColoursConfig';
+import OtherConfig from './components/OtherConfig';
 import ChartCanvas from './components/ChartCanvas';
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <>
           {currentConfig === 'charts' && <ChartConfig />}
           {currentConfig === 'colours' && <ColorConfig />}
+          {currentConfig === 'other' && <OtherConfig />}
           <ChartCanvas />
         </>
       )}

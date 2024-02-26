@@ -3,7 +3,7 @@ import { InboxOutlined } from '@ant-design/icons';
 import { Space, Table, Tag } from 'antd';
 import { Divider } from 'antd';
 import { message, Upload } from 'antd';
-import { Segmented } from 'antd';
+import { Select } from 'antd';
 
 const { Dragger } = Upload;
 const props = {
@@ -25,15 +25,6 @@ const props = {
         console.log('Dropped files', e.dataTransfer.files);
     },
 };
-
-const Demo = () => (
-    <Segmented
-        options={['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']}
-        onChange={(value) => {
-            console.log(value); // string
-        }}
-    />
-);
 
 const dataSource = [
     {
@@ -80,7 +71,26 @@ const DataConfig = () => (
         </Dragger>
         <Divider />
         <div className='mt-6'>
-            <Demo />
+        <Select
+              defaultValue="Sales.csv"
+              style={{
+                width: 200,
+              }}
+              options={[
+                {
+                  value: 'Sales.csv',
+                  label: 'Sales.csv',
+                },
+                {
+                  value: 'Customers.csv',
+                  label: 'Customers.csv',
+                },
+                {
+                  value: 'Products.csv',
+                  label: 'Products.csv',
+                },
+              ]}
+            />
         </div>
         <div className='mt-6'>
             <Table dataSource={dataSource} columns={columns} />
