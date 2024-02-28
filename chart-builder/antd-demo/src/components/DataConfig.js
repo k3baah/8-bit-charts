@@ -6,25 +6,23 @@ import Papa from 'papaparse';
 const { Dragger } = Upload;
 
 const DataConfig = () => {
-    const [dataSource, setDataSource] = useState([]);
-    const [columns, setColumns] = useState([]);
+    const [dataSources, setDataSources] = useState({}); // Changed to store data by file name
+    const [columns, setColumns] = useState({}); // Changed to store columns by file name
     const [tableNames, setTableNames] = useState([]);
+    const [selectedTable, setSelectedTable] = useState(''); // State to keep track of the selected table
 
     const handleFileRead = (file) => {
         Papa.parse(file, {
             complete: (result) => {
                 const data = result.data;
                 if (data.length > 0) {
-                    // Assuming the first row contains column headers
                     const headers = data[0];
                     const formattedColumns = headers.map((header, index) => ({
                         title: header,
                         dataIndex: header.toLowerCase(),
                         key: index,
                     }));
-                    setColumns(formattedColumns);
 
-                    // Convert the rest of the data into dataSource format
                     const formattedData = data.slice(1).map((row, index) => {
                         const rowData = {};
                         headers.forEach((header, i) => {
@@ -32,11 +30,19 @@ const DataConfig = () => {
                         });
                         return { key: index, ...rowData };
                     });
-                    setDataSource(formattedData);
+
+                    // Store data and columns under the file name key
+                    setDataSources(prevSources => ({ ...prevSources, [file.name]: formattedData }));
+                    setColumns(prevColumns => ({ ...prevColumns, [file.name]: formattedColumns }));
+                    if (!selectedTable) setSelectedTable(file.name); // Set the first uploaded file as selected by default
                 }
             },
             header: false,
         });
+    };
+
+    const handleSelectChange = (value) => {
+        setSelectedTable(value); // Update the selected table based on the user's selection
     };
 
     const props = {
@@ -47,27 +53,16 @@ const DataConfig = () => {
             setTableNames(prevNames => [...prevNames, file.name]);
             return false; // Prevent actual upload
         },
-        onChange(info) {
-            const { status } = info.file;
-            if (status !== 'uploading') {
-                console.log(info.file, info.fileList);
-            }
-            if (status === 'done') {
-                message.success(`${info.file.name} file uploaded successfully.`);
-            } else if (status === 'error') {
-                message.error(`${info.file.name} file upload failed.`);
-            }
-        },
-        onDrop(e) {
-            console.log('Dropped files', e.dataTransfer.files);
-        },
         onRemove: (file) => {
             setTableNames(prevNames => {
                 const updatedNames = prevNames.filter(name => name !== file.name);
-                // If there are no more tables left, clear both the dataSource and columns
                 if (updatedNames.length === 0) {
-                    setDataSource([]);
-                    setColumns([]); // Clear columns here
+                    setDataSources({});
+                    setColumns({});
+                    setSelectedTable('');
+                } else if (selectedTable === file.name) {
+                    // If the removed file was selected, switch to another table
+                    setSelectedTable(updatedNames[0]);
                 }
                 return updatedNames;
             });
@@ -91,7 +86,8 @@ const DataConfig = () => {
                     <Select
                         className='w-64'
                         placeholder={''}
-                        defaultValue={tableNames[0]}
+                        defaultValue={selectedTable}
+                        onChange={handleSelectChange} // Add onChange handler
                     >
                         {tableNames.map((name, index) => (
                             <Select.Option key={index} value={name}>
@@ -102,7 +98,8 @@ const DataConfig = () => {
                 )}
             </div>
             <div className='mt-6'>
-                <Table dataSource={dataSource} columns={columns} />
+                {/* Use selectedTable to determine which dataSource and columns to display */}
+                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]} />
             </div>
         </div>
     );
