@@ -105,6 +105,7 @@ const DataConfig = () => {
             </Dragger>
             <Divider />
             <div className='mt-6'>
+                <h2 className='mb-2 text-gray-500'>View</h2>
                 {tableNames.length > 0 && (
                     <Select
                         className='w-64'
