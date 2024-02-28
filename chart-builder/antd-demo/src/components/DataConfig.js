@@ -51,6 +51,7 @@ const DataConfig = () => {
         beforeUpload: (file) => {
             handleFileRead(file);
             setTableNames(prevNames => [...prevNames, file.name]);
+            setSelectedTable(file.name); // Set the uploaded file as the selected table
             return false; // Prevent actual upload
         },
         onRemove: (file) => {
@@ -86,7 +87,7 @@ const DataConfig = () => {
                     <Select
                         className='w-64'
                         placeholder={''}
-                        defaultValue={selectedTable}
+                        value={selectedTable} // Use the selectedTable state as the value
                         onChange={handleSelectChange} // Add onChange handler
                     >
                         {tableNames.map((name, index) => (
