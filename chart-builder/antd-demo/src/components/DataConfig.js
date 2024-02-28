@@ -17,12 +17,34 @@ const DataConfig = () => {
                 const data = result.data;
                 if (data.length > 0) {
                     const headers = data[0];
-                    const formattedColumns = headers.map((header, index) => ({
-                        title: header,
-                        dataIndex: header.toLowerCase(),
-                        key: index,
-                    }));
-
+                    const formattedColumns = headers.map((header, index) => {
+                        const dataIndex = header.toLowerCase();
+                        return {
+                            title: header,
+                            dataIndex: dataIndex,
+                            key: index,
+                            sorter: (a, b) => {
+                                const valueA = a[dataIndex];
+                                const valueB = b[dataIndex];
+                                // Handle undefined values by treating them as empty strings for comparison
+                                if (valueA === undefined && valueB === undefined) {
+                                    return 0;
+                                }
+                                if (valueA === undefined) {
+                                    return -1;
+                                }
+                                if (valueB === undefined) {
+                                    return 1;
+                                }
+                                // Check if the values are numbers to perform a numeric sort
+                                if (!isNaN(Number(valueA)) && !isNaN(Number(valueB))) {
+                                    return Number(valueA) - Number(valueB);
+                                }
+                                // Fallback to string comparison if not numbers
+                                return valueA.localeCompare(valueB);
+                            },
+                        };
+                    });
                     const formattedData = data.slice(1).map((row, index) => {
                         const rowData = {};
                         headers.forEach((header, i) => {
@@ -100,7 +122,7 @@ const DataConfig = () => {
             </div>
             <div className='mt-6'>
                 {/* Use selectedTable to determine which dataSource and columns to display */}
-                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]} />
+                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]} title={() => selectedTable}/>
             </div>
         </div>
     );
