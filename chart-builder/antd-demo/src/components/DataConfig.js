@@ -122,7 +122,7 @@ const DataConfig = () => {
             </div>
             <div className='mt-6'>
                 {/* Use selectedTable to determine which dataSource and columns to display */}
-                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]} title={() => selectedTable}/>
+                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]}/>
             </div>
         </div>
     );
