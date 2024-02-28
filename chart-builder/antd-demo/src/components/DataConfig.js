@@ -43,10 +43,9 @@ const DataConfig = () => {
         name: 'file',
         multiple: true,
         beforeUpload: (file) => {
-            handleFileRead(file, file.name);
-            // Prevent upload since we're handling the file locally
+            handleFileRead(file);
             setTableNames(prevNames => [...prevNames, file.name]);
-            return false;
+            return false; // Prevent actual upload
         },
         onChange(info) {
             const { status } = info.file;
@@ -61,6 +60,17 @@ const DataConfig = () => {
         },
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
+        },
+        onRemove: (file) => {
+            setTableNames(prevNames => {
+                const updatedNames = prevNames.filter(name => name !== file.name);
+                // If there are no more tables left, clear both the dataSource and columns
+                if (updatedNames.length === 0) {
+                    setDataSource([]);
+                    setColumns([]); // Clear columns here
+                }
+                return updatedNames;
+            });
         },
     };
 
@@ -77,13 +87,21 @@ const DataConfig = () => {
             </Dragger>
             <Divider />
             <div className='mt-6'>
-                <Select>
-                    {tableNames.map((name, index) => (
-                        <Select.Option key={index} value={name}>
-                            {name}
-                        </Select.Option>
-                    ))}
-                </Select>
+                {tableNames.length > 0 && (
+                    <Select
+                        className='w-64'
+                        placeholder={''}
+                        defaultValue={tableNames[0]}
+                    >
+                        {tableNames.map((name, index) => (
+                            <Select.Option key={index} value={name}>
+                                {name}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                )}
+            </div>
+            <div className='mt-6'>
                 <Table dataSource={dataSource} columns={columns} />
             </div>
         </div>
