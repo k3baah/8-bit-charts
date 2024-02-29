@@ -1,8 +1,19 @@
 import React from 'react';
 import { BarChartOutlined, PieChartOutlined, LineChartOutlined, HeatMapOutlined, CalendarOutlined, TableOutlined, DotChartOutlined, BorderOutlined, BuildOutlined, EditOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Flex, Button, Select } from 'antd';
+import { useData } from './DataContext';
 
 const ChartConfig = () => {
+  const { fileList, columns, selectedTable } = useData(); // Use the useData hook to access DataContext values
+
+  // Convert fileList and columns to options format expected by Ant Design Select
+  const fileOptions = fileList.map(file => ({ value: file.name, label: file.name }));
+  // const columnOptions = Object.keys(columns).map(column => ({ value: column, label: column }));
+  const columnOptions = columns[selectedTable]?.map(column => ({
+    value: column.dataIndex, // Use dataIndex as the value since it's unique
+    label: column.title // Use the title for the label
+  })) || [];
+
   return (
     <div className='my-6 mx-6'>
       <Flex gap='large'>
@@ -28,30 +39,16 @@ const ChartConfig = () => {
           </Flex>
         </Flex>
       </Flex>
-      
+
       <Flex gap='large'>
         <Flex vertical>
           <div className='my-3'>Data</div>
           <Flex gap='small'>
             <Select
-              defaultValue="Sales.csv"
-              style={{
-                width: 200,
-              }}
-              options={[
-                {
-                  value: 'Sales.csv',
-                  label: 'Sales.csv',
-                },
-                {
-                  value: 'Customers.csv',
-                  label: 'Customers.csv',
-                },
-                {
-                  value: 'Products.csv',
-                  label: 'Products.csv',
-                },
-              ]}
+              style={{ width: 200 }}
+              options={fileOptions}
+              value={fileOptions.length > 0 ? fileOptions[0].value : undefined} // Set default value to the first option if available
+              disabled={fileOptions.length === 0} // Disable if no options are available
             />
           </Flex>
         </Flex>
@@ -59,24 +56,10 @@ const ChartConfig = () => {
           <div className='my-3'>Key</div>
           <Flex gap='small'>
             <Select
-              defaultValue="Product"
-              style={{
-                width: 200,
-              }}
-              options={[
-                {
-                  value: 'Product',
-                  label: 'Product',
-                },
-                {
-                  value: 'Location',
-                  label: 'Location',
-                },
-                {
-                  value: 'Customer',
-                  label: 'Customer',
-                },
-              ]}
+              style={{ width: 200 }}
+              options={columnOptions}
+              value={columnOptions.length > 0 ? columnOptions[0].value : undefined} // Set default value to the first option if available
+              disabled={columnOptions.length === 0} // Disable if no options are available
             />
           </Flex>
         </Flex>
@@ -84,25 +67,11 @@ const ChartConfig = () => {
           <div className='my-3'>Values</div>
           <Flex gap='small'>
             <Select
-            mode='multiple'
-              defaultValue="Sales"
-              style={{
-                width: 200,
-              }}
-              options={[
-                {
-                  value: 'Sales',
-                  label: 'Sales',
-                },
-                {
-                  value: 'Last Year Sales',
-                  label: 'Last Year Sales',
-                },
-                {
-                  value: 'Quantity',
-                  label: 'Quantity',
-                },
-              ]}
+              mode='multiple'
+              style={{ width: 200 }}
+              options={columnOptions}
+              value={columnOptions.length > 0 ? [columnOptions[0].value] : []} // Set default value to the first option if available
+              disabled={columnOptions.length === 0} // Disable if no options are available
             />
           </Flex>
         </Flex>
