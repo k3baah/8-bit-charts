@@ -4,7 +4,7 @@ import { Flex, Button, Select } from 'antd';
 import { useData } from './DataContext';
 
 const ChartConfig = () => {
-  const { fileList, columns, selectedTable, dataSources } = useData(); // Assuming dataSources is available via useData for checking data types
+  const { fileList, columns, selectedTable, setSelectedTable, dataSources } = useData(); // Assuming dataSources is available via useData for checking data types
   const fileOptions = fileList.map(file => ({ value: file.name, label: file.name }));
 
   // Assuming dataSources[selectedTable] exists and has at least one row for type inference
@@ -63,8 +63,8 @@ const ChartConfig = () => {
             <Select
               style={{ width: 200 }}
               options={fileOptions}
-              value={selectedFile} // Use state for value
-              onChange={setSelectedFile} // Update state on change
+              value={selectedTable} // Use state for value
+              onChange={value => setSelectedTable(value)} // Update DataContext // Update state on change
               disabled={fileOptions.length === 0}
             />
           </Flex>
