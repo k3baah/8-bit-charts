@@ -5,11 +5,13 @@ import ChartConfig from './components/ChartConfig';
 import ColorConfig from './components/ColoursConfig';
 import OtherConfig from './components/OtherConfig';
 import ChartCanvas from './components/ChartCanvas';
+import { DataProvider } from './components/DataContext';
 
 const App = () => {
   const [currentConfig, setCurrentConfig] = useState('data');
 
   return (
+    <DataProvider>
     <div>
       <Navbar currentConfig={currentConfig} setCurrentConfig={setCurrentConfig} />
       {currentConfig === 'data' ? (
@@ -25,6 +27,7 @@ const App = () => {
         </>
       )}
     </div>
+    </DataProvider>
   );
 };
 

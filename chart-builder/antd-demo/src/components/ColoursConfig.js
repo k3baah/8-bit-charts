@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { DownOutlined } from '@ant-design/icons';
-import { ColorPicker, Space, Flex, Divider } from 'antd';
+import React from 'react';
+import { ColorPicker, Space, Flex } from 'antd';
 
 const Demo = () => {
-    const [open, setOpen] = useState(false);
     return (
         <Space direction="vertical">
             <ColorPicker defaultValue="#1677ff" showText />

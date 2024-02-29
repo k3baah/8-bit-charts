@@ -1,42 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import { Table, Divider, Upload, Select } from 'antd';
 import Papa from 'papaparse';
+import { useData } from './DataContext'; 
 
 const { Dragger } = Upload;
 
 const DataConfig = () => {
-    // Initialize state with data from localStorage if available
-    const [dataSources, setDataSources] = useState(() => {
-        const localData = localStorage.getItem('dataSources');
-        return localData ? JSON.parse(localData) : {};
-    });
-    const [columns, setColumns] = useState(() => {
-        const localColumns = localStorage.getItem('columns');
-        return localColumns ? JSON.parse(localColumns) : {};
-    });
-    const [tableNames, setTableNames] = useState(() => {
-        const localTableNames = localStorage.getItem('tableNames');
-        return localTableNames ? JSON.parse(localTableNames) : [];
-    });
-    const [selectedTable, setSelectedTable] = useState(() => {
-        const localSelectedTable = localStorage.getItem('selectedTable');
-        return localSelectedTable || '';
-    });
-    const [fileList, setFileList] = useState(() => {
-        // Initialize fileList from localStorage or empty array if not available
-        const localFileList = localStorage.getItem('fileList');
-        return localFileList ? JSON.parse(localFileList) : [];
-    });
-
-    // Update localStorage whenever the state changes
-    useEffect(() => {
-        localStorage.setItem('dataSources', JSON.stringify(dataSources));
-        localStorage.setItem('columns', JSON.stringify(columns));
-        localStorage.setItem('tableNames', JSON.stringify(tableNames));
-        localStorage.setItem('selectedTable', selectedTable);
-        localStorage.setItem('fileList', JSON.stringify(fileList)); // Save fileList to localStorage
-    }, [dataSources, columns, tableNames, selectedTable, fileList]);
+    const {
+        dataSources,
+        setDataSources,
+        columns,
+        setColumns,
+        tableNames,
+        setTableNames,
+        selectedTable,
+        setSelectedTable,
+        fileList,
+        setFileList,
+    } = useData();
 
     const handleFileRead = (file, onSuccess) => {
         Papa.parse(file, {
@@ -80,10 +62,12 @@ const DataConfig = () => {
                         return { key: index, ...rowData };
                     });
 
-                    // Store data and columns under the file name key
-                    setDataSources(prevSources => ({ ...prevSources, [file.name]: formattedData }));
-                    setColumns(prevColumns => ({ ...prevColumns, [file.name]: formattedColumns }));
-                    if (!selectedTable) setSelectedTable(file.name); // Set the first uploaded file as selected by default
+                    // Update the shared state
+                    setDataSources(prev => ({ ...prev, [file.name]: formattedData }));
+                    setColumns(prev => ({ ...prev, [file.name]: formattedColumns }));
+                    setTableNames(prev => [...prev, file.name]);
+                    if (!selectedTable) setSelectedTable(file.name);
+
                     onSuccess();
                 }
             },
