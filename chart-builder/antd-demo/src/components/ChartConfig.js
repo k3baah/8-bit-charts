@@ -19,16 +19,32 @@ const ChartConfig = () => {
   // Filter options for numeric values only
   const numericColumnOptions = columnOptions.filter(option => option.isNumeric);
   const [selectedFile, setSelectedFile] = useState(undefined);
-    // Update selectedFile when fileList changes
-    useEffect(() => {
-      if (fileList.length > 0) {
-        const lastUploadedFile = fileList[fileList.length - 1].name;
-        setSelectedFile(lastUploadedFile);
-      }
-    }, [fileList]);
+  // Update selectedFile when fileList changes
+  useEffect(() => {
+    if (fileList.length > 0) {
+      const lastUploadedFile = fileList[fileList.length - 1].name;
+      setSelectedFile(lastUploadedFile);
+    }
+  }, [fileList]);
 
   const [selectedKey, setSelectedKey] = useState(columnOptions.length > 0 ? columnOptions[0].value : undefined);
   const [selectedValues, setSelectedValues] = useState(columnOptions.length > 0 ? [columnOptions[0].value] : []);
+
+  useEffect(() => {
+    // Recalculate column options based on the newly selected table
+    const newColumnOptions = columns[selectedTable]?.map(column => ({
+      value: column.dataIndex,
+      label: column.title,
+      isNumeric: !isNaN(firstRow[column.dataIndex]) // Reusing your existing logic for numeric inference
+    })) || [];
+
+    // Update selectedKey to the first column's dataIndex or undefined if no columns are available
+    setSelectedKey(newColumnOptions.length > 0 ? newColumnOptions[0].value : undefined);
+
+    // Filter newColumnOptions for numeric values only and update selectedValues
+    const newNumericColumnOptions = newColumnOptions.filter(option => option.isNumeric);
+    setSelectedValues(newNumericColumnOptions.length > 0 ? [newNumericColumnOptions[0].value] : []);
+  }, [selectedTable, columns, firstRow]);
 
   return (
     <div className='my-6 mx-6'>
