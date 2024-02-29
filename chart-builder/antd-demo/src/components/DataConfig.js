@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
-import { Table, Divider, message, Upload, Select } from 'antd';
+import { Table, Divider, Upload, Select } from 'antd';
 import Papa from 'papaparse';
 
 const { Dragger } = Upload;
 
 const DataConfig = () => {
-    const [dataSources, setDataSources] = useState({}); // Changed to store data by file name
-    const [columns, setColumns] = useState({}); // Changed to store columns by file name
-    const [tableNames, setTableNames] = useState([]);
-    const [selectedTable, setSelectedTable] = useState(''); // State to keep track of the selected table
+    // Initialize state with data from localStorage if available
+    const [dataSources, setDataSources] = useState(() => {
+        const localData = localStorage.getItem('dataSources');
+        return localData ? JSON.parse(localData) : {};
+    });
+    const [columns, setColumns] = useState(() => {
+        const localColumns = localStorage.getItem('columns');
+        return localColumns ? JSON.parse(localColumns) : {};
+    });
+    const [tableNames, setTableNames] = useState(() => {
+        const localTableNames = localStorage.getItem('tableNames');
+        return localTableNames ? JSON.parse(localTableNames) : [];
+    });
+    const [selectedTable, setSelectedTable] = useState(() => {
+        const localSelectedTable = localStorage.getItem('selectedTable');
+        return localSelectedTable || '';
+    });
+    const [fileList, setFileList] = useState(() => {
+        // Initialize fileList from localStorage or empty array if not available
+        const localFileList = localStorage.getItem('fileList');
+        return localFileList ? JSON.parse(localFileList) : [];
+    });
 
-    const handleFileRead = (file) => {
+    // Update localStorage whenever the state changes
+    useEffect(() => {
+        localStorage.setItem('dataSources', JSON.stringify(dataSources));
+        localStorage.setItem('columns', JSON.stringify(columns));
+        localStorage.setItem('tableNames', JSON.stringify(tableNames));
+        localStorage.setItem('selectedTable', selectedTable);
+        localStorage.setItem('fileList', JSON.stringify(fileList)); // Save fileList to localStorage
+    }, [dataSources, columns, tableNames, selectedTable, fileList]);
+
+    const handleFileRead = (file, onSuccess) => {
         Papa.parse(file, {
             complete: (result) => {
                 const data = result.data;
@@ -57,6 +84,7 @@ const DataConfig = () => {
                     setDataSources(prevSources => ({ ...prevSources, [file.name]: formattedData }));
                     setColumns(prevColumns => ({ ...prevColumns, [file.name]: formattedColumns }));
                     if (!selectedTable) setSelectedTable(file.name); // Set the first uploaded file as selected by default
+                    onSuccess();
                 }
             },
             header: false,
@@ -70,25 +98,42 @@ const DataConfig = () => {
     const props = {
         name: 'file',
         multiple: true,
-        beforeUpload: (file) => {
-            handleFileRead(file);
-            setTableNames(prevNames => [...prevNames, file.name]);
-            setSelectedTable(file.name); // Set the uploaded file as the selected table
+        fileList: fileList,
+        beforeUpload: (file, fileList) => {
+            // Process the file
+            handleFileRead(file, () => {
+                // Update fileList state
+                const newFileList = fileList.map(file => ({
+                    uid: file.uid,
+                    name: file.name,
+                    status: 'done',
+                }));
+                setFileList(newFileList);
+                // Update tableNames and selectedTable as needed
+                setTableNames(prevNames => [...prevNames, file.name]);
+                setSelectedTable(file.name);
+                // No need to call `setDataSources` and `setColumns` here,
+                // as they are already being updated in `handleFileRead`
+            });
             return false; // Prevent actual upload
         },
         onRemove: (file) => {
-            setTableNames(prevNames => {
-                const updatedNames = prevNames.filter(name => name !== file.name);
-                if (updatedNames.length === 0) {
-                    setDataSources({});
-                    setColumns({});
-                    setSelectedTable('');
-                } else if (selectedTable === file.name) {
-                    // If the removed file was selected, switch to another table
-                    setSelectedTable(updatedNames[0]);
-                }
-                return updatedNames;
-            });
+            // Update fileList state
+            const newFileList = fileList.filter(item => item.uid !== file.uid);
+            setFileList(newFileList);
+            // Remove data from dataSources and columns
+            const newDataSources = { ...dataSources };
+            delete newDataSources[file.name];
+            setDataSources(newDataSources);
+            const newColumns = { ...columns };
+            delete newColumns[file.name];
+            setColumns(newColumns);
+            // Update tableNames and selectedTable as needed
+            const newTableNames = tableNames.filter(name => name !== file.name);
+            setTableNames(newTableNames);
+            if (selectedTable === file.name) {
+                setSelectedTable(newTableNames.length > 0 ? newTableNames[0] : '');
+            }
         },
     };
 
@@ -105,7 +150,7 @@ const DataConfig = () => {
             </Dragger>
             <Divider />
             <div className='mt-6'>
-                <h2 className='mb-2 text-gray-500'>View</h2>
+                {/* <h2 className='mb-2 text-gray-500'>View</h2> */}
                 {tableNames.length > 0 && (
                     <Select
                         className='w-64'
