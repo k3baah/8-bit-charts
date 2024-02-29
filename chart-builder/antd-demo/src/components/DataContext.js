@@ -29,11 +29,20 @@ export const DataProvider = ({ children }) => {
 
     // Effect to sync state with localStorage
     useEffect(() => {
-        localStorage.setItem('dataSources', JSON.stringify(dataSources));
-        localStorage.setItem('columns', JSON.stringify(columns));
-        localStorage.setItem('tableNames', JSON.stringify(tableNames));
-        localStorage.setItem('selectedTable', selectedTable);
-        localStorage.setItem('fileList', JSON.stringify(fileList));
+        try {
+            localStorage.setItem('dataSources', JSON.stringify(dataSources));
+            localStorage.setItem('columns', JSON.stringify(columns));
+            localStorage.setItem('tableNames', JSON.stringify(tableNames));
+            localStorage.setItem('selectedTable', selectedTable);
+            localStorage.setItem('fileList', JSON.stringify(fileList));
+        } catch (error) {
+            if (error instanceof DOMException && error.code === 22) {
+                // DOMException 22 is the error code for QuotaExceededError in most browsers
+                // message.error('Local storage limit exceeded. Please remove some items.');
+            } else {
+                console.error('Failed to save to localStorage:', error);
+            }
+        }
     }, [dataSources, columns, tableNames, selectedTable, fileList]);
 
     // The value that will be given to the context

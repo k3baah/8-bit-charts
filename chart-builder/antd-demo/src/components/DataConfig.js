@@ -1,8 +1,8 @@
 import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
-import { Table, Divider, Upload, Select } from 'antd';
+import { Table, Divider, Upload, Select, message } from 'antd';
 import Papa from 'papaparse';
-import { useData } from './DataContext'; 
+import { useData } from './DataContext';
 
 const { Dragger } = Upload;
 
@@ -84,12 +84,22 @@ const DataConfig = () => {
         multiple: true,
         fileList: fileList, // Use state fileList
         beforeUpload: (file) => {
+            const isUnderSizeLimit = (file) => {
+                const totalSize = fileList.reduce((acc, currentFile) => acc + currentFile.size, 0) + file.size;
+                return totalSize <= 5 * 1024 * 1024;
+            };
+        
+            if (!isUnderSizeLimit(file)) {
+                message.error('Total file size must be smaller than 5MB');
+                return Upload.LIST_IGNORE; // This should prevent the file from being added
+            }
             // Process the file
             handleFileRead(file, () => {
-                // Update fileList state
+                // File size check has already been done, just process the file
                 const newFile = {
                     uid: file.uid,
                     name: file.name,
+                    size: file.size, // Make sure to include the file size here
                     status: 'done',
                 };
                 setFileList(currentFileList => [...currentFileList, newFile]);
@@ -125,7 +135,7 @@ const DataConfig = () => {
                 </p>
                 <p className="ant-upload-text">Click or drag file to this area to upload</p>
                 <p className="ant-upload-hint">
-                    Support for a single or bulk upload. Max 5MB. 
+                    Support for a single or bulk upload. Max 5MB.
                 </p>
             </Dragger>
             <Divider />
@@ -148,7 +158,7 @@ const DataConfig = () => {
             </div>
             <div className='mt-6'>
                 {/* Use selectedTable to determine which dataSource and columns to display */}
-                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]}/>
+                <Table dataSource={dataSources[selectedTable]} columns={columns[selectedTable]} />
             </div>
         </div>
     );
