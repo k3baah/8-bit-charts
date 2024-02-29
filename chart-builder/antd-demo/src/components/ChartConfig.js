@@ -1,18 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChartOutlined, PieChartOutlined, LineChartOutlined, HeatMapOutlined, CalendarOutlined, TableOutlined, DotChartOutlined, BorderOutlined, BuildOutlined, EditOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Flex, Button, Select } from 'antd';
 import { useData } from './DataContext';
 
 const ChartConfig = () => {
-  const { fileList, columns, selectedTable } = useData(); // Use the useData hook to access DataContext values
-
-  // Convert fileList and columns to options format expected by Ant Design Select
+  const { fileList, columns, selectedTable, dataSources } = useData(); // Assuming dataSources is available via useData for checking data types
   const fileOptions = fileList.map(file => ({ value: file.name, label: file.name }));
-  // const columnOptions = Object.keys(columns).map(column => ({ value: column, label: column }));
+
+  // Assuming dataSources[selectedTable] exists and has at least one row for type inference
+  const firstRow = dataSources[selectedTable]?.[0] || {};
+
   const columnOptions = columns[selectedTable]?.map(column => ({
-    value: column.dataIndex, // Use dataIndex as the value since it's unique
-    label: column.title // Use the title for the label
+    value: column.dataIndex,
+    label: column.title,
+    isNumeric: !isNaN(firstRow[column.dataIndex]) // Infer numeric based on first row's data
   })) || [];
+
+  // Filter options for numeric values only
+  const numericColumnOptions = columnOptions.filter(option => option.isNumeric);
+  const [selectedFile, setSelectedFile] = useState(undefined);
+    // Update selectedFile when fileList changes
+    useEffect(() => {
+      if (fileList.length > 0) {
+        const lastUploadedFile = fileList[fileList.length - 1].name;
+        setSelectedFile(lastUploadedFile);
+      }
+    }, [fileList]);
+
+  const [selectedKey, setSelectedKey] = useState(columnOptions.length > 0 ? columnOptions[0].value : undefined);
+  const [selectedValues, setSelectedValues] = useState(columnOptions.length > 0 ? [columnOptions[0].value] : []);
 
   return (
     <div className='my-6 mx-6'>
@@ -47,8 +63,9 @@ const ChartConfig = () => {
             <Select
               style={{ width: 200 }}
               options={fileOptions}
-              value={fileOptions.length > 0 ? fileOptions[0].value : undefined} // Set default value to the first option if available
-              disabled={fileOptions.length === 0} // Disable if no options are available
+              value={selectedFile} // Use state for value
+              onChange={setSelectedFile} // Update state on change
+              disabled={fileOptions.length === 0}
             />
           </Flex>
         </Flex>
@@ -58,8 +75,9 @@ const ChartConfig = () => {
             <Select
               style={{ width: 200 }}
               options={columnOptions}
-              value={columnOptions.length > 0 ? columnOptions[0].value : undefined} // Set default value to the first option if available
-              disabled={columnOptions.length === 0} // Disable if no options are available
+              value={selectedKey} // Use state for value
+              onChange={setSelectedKey} // Update state on change
+              disabled={columnOptions.length === 0}
             />
           </Flex>
         </Flex>
@@ -69,9 +87,10 @@ const ChartConfig = () => {
             <Select
               mode='multiple'
               style={{ width: 200 }}
-              options={columnOptions}
-              value={columnOptions.length > 0 ? [columnOptions[0].value] : []} // Set default value to the first option if available
-              disabled={columnOptions.length === 0} // Disable if no options are available
+              options={numericColumnOptions} // Use filtered numeric options
+              value={selectedValues} // Use state for value
+              onChange={setSelectedValues} // Update state on change
+              disabled={numericColumnOptions.length === 0}
             />
           </Flex>
         </Flex>

@@ -82,22 +82,18 @@ const DataConfig = () => {
     const props = {
         name: 'file',
         multiple: true,
-        fileList: fileList,
-        beforeUpload: (file, fileList) => {
+        fileList: fileList, // Use state fileList
+        beforeUpload: (file) => {
             // Process the file
             handleFileRead(file, () => {
                 // Update fileList state
-                const newFileList = fileList.map(file => ({
+                const newFile = {
                     uid: file.uid,
                     name: file.name,
                     status: 'done',
-                }));
-                setFileList(newFileList);
-                // Update tableNames and selectedTable as needed
-                setTableNames(prevNames => [...prevNames, file.name]);
-                setSelectedTable(file.name);
-                // No need to call `setDataSources` and `setColumns` here,
-                // as they are already being updated in `handleFileRead`
+                };
+                setFileList(currentFileList => [...currentFileList, newFile]);
+                // Note: No need to update tableNames and selectedTable here since it's done in handleFileRead
             });
             return false; // Prevent actual upload
         },
