@@ -5,7 +5,7 @@ import ChartConfig from './components/ChartConfig';
 import ColorConfig from './components/ColoursConfig';
 import OtherConfig from './components/OtherConfig';
 import ChartCanvas from './components/ChartCanvas';
-import VictoryBarChart from './components/charts/VictoryBarChart'; // Ensure correct import path
+import VictoryBarChart from './components/charts/VictoryBarChart'; 
 import { DataProvider } from './components/DataContext';
 
 const App = () => {

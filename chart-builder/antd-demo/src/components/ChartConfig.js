@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BarChartOutlined, PieChartOutlined, LineChartOutlined, HeatMapOutlined, CalendarOutlined, TableOutlined, DotChartOutlined, BorderOutlined, BuildOutlined, EditOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Flex, Button, Select } from 'antd';
 import { useData } from './DataContext';
@@ -8,7 +8,7 @@ const ChartConfig = () => {
   const fileOptions = fileList.map(file => ({ value: file.name, label: file.name }));
 
   // Assuming dataSources[selectedTable] exists and has at least one row for type inference
-  const firstRow = dataSources[selectedTable]?.[0] || {};
+  const firstRow = useMemo(() => dataSources[selectedTable]?.[0] || {}, [dataSources, selectedTable]);
 
   const columnOptions = columns[selectedTable]?.map(column => ({
     value: column.dataIndex,

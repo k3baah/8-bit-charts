@@ -6,6 +6,8 @@ const VictoryBarChart = ({ data }) => {
     <VictoryChart 
       theme={VictoryTheme.material}
       domainPadding={20}
+      width={500} 
+      height={200} 
     >
       <VictoryAxis
         tickValues={data.map(d => d.label)}
@@ -19,6 +21,8 @@ const VictoryBarChart = ({ data }) => {
         data={data}
         x="label"
         y="value"
+        style={{
+          data: { fill: "#c43a31" } }}
       />
     </VictoryChart>
   );
