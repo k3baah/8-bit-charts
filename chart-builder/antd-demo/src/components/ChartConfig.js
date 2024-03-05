@@ -4,7 +4,7 @@ import { Flex, Button, Select } from 'antd';
 import { useData } from './DataContext';
 
 const ChartConfig = () => {
-  const { fileList, columns, selectedTable, setSelectedTable, dataSources } = useData(); // Assuming dataSources is available via useData for checking data types
+  const { fileList, columns, selectedTable, setSelectedTable, dataSources, selectedKey, setSelectedKey, selectedValues, setSelectedValues  } = useData(); // Assuming dataSources is available via useData for checking data types
   const fileOptions = fileList.map(file => ({ value: file.name, label: file.name }));
 
   // Assuming dataSources[selectedTable] exists and has at least one row for type inference
@@ -27,8 +27,7 @@ const ChartConfig = () => {
     }
   }, [fileList]);
 
-  const [selectedKey, setSelectedKey] = useState(columnOptions.length > 0 ? columnOptions[0].value : undefined);
-  const [selectedValues, setSelectedValues] = useState(columnOptions.length > 0 ? [columnOptions[0].value] : []);
+
 
   useEffect(() => {
     // Recalculate column options based on the newly selected table
@@ -91,8 +90,11 @@ const ChartConfig = () => {
             <Select
               style={{ width: 200 }}
               options={columnOptions}
-              value={selectedKey} // Use state for value
-              onChange={setSelectedKey} // Update state on change
+              value={selectedKey}
+              onChange={(value) => {
+                console.log('New selectedKey:', value);
+                setSelectedKey(value);
+              }}
               disabled={columnOptions.length === 0}
             />
           </Flex>
@@ -101,11 +103,14 @@ const ChartConfig = () => {
           <div className='my-3'>Values</div>
           <Flex gap='small'>
             <Select
-              mode='multiple'
+              mode="multiple"
               style={{ width: 200 }}
-              options={numericColumnOptions} // Use filtered numeric options
-              value={selectedValues} // Use state for value
-              onChange={setSelectedValues} // Update state on change
+              options={numericColumnOptions}
+              value={selectedValues}
+              onChange={(values) => {
+                console.log('New selectedValues:', values);
+                setSelectedValues(values);
+              }}
               disabled={numericColumnOptions.length === 0}
             />
           </Flex>

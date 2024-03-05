@@ -1,7 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
-// Create a Context
-const DataContext = createContext();
+const DataContext = createContext({
+    dataSources: {}, // Initialize with an empty object or suitable default
+    setDataSources: () => {},
+    // Initialize other properties similarly
+  });
 
 // Provider Component
 export const DataProvider = ({ children }) => {
@@ -26,9 +29,23 @@ export const DataProvider = ({ children }) => {
         const localFileList = localStorage.getItem('fileList');
         return localFileList ? JSON.parse(localFileList) : [];
     });
+    const [selectedKey, setSelectedKey] = useState(() => {
+        const localSelectedKey = localStorage.getItem('selectedKey');
+        return localSelectedKey || '';
+    });
+    
+    const [selectedValues, setSelectedValues] = useState(() => {
+        const localSelectedValues = localStorage.getItem('selectedValues');
+        return localSelectedValues ? JSON.parse(localSelectedValues) : [];
+    });
+
+    console.log("selected key", selectedKey)
+    console.log("selected values", selectedValues)
 
     // Effect to sync state with localStorage
     useEffect(() => {
+        console.log("Current dataSources:", dataSources);
+        console.log("Current selectedTable:", selectedTable);
         try {
             localStorage.setItem('dataSources', JSON.stringify(dataSources));
             localStorage.setItem('columns', JSON.stringify(columns));
@@ -44,6 +61,7 @@ export const DataProvider = ({ children }) => {
             }
         }
     }, [dataSources, columns, tableNames, selectedTable, fileList]);
+    
 
     // The value that will be given to the context
     const value = {
@@ -57,7 +75,12 @@ export const DataProvider = ({ children }) => {
         setSelectedTable,
         fileList,
         setFileList,
+        selectedKey,
+        setSelectedKey,
+        selectedValues,
+        setSelectedValues,
     };
+
 
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };

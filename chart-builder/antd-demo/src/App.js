@@ -5,17 +5,12 @@ import ChartConfig from './components/ChartConfig';
 import ColorConfig from './components/ColoursConfig';
 import OtherConfig from './components/OtherConfig';
 import ChartCanvas from './components/ChartCanvas';
-import VictoryBarChart from './components/charts/VictoryBarChart'; 
+import BarChart from './components/charts/BarChart'; 
 import { DataProvider } from './components/DataContext';
 
 const App = () => {
   const [currentConfig, setCurrentConfig] = useState('data');
-  const sampleData = [
-    { label: 'A', value: 120 },
-    { label: 'B', value: 150 },
-    { label: 'C', value: 80 },
-    { label: 'D', value: 70 }
-  ];
+  // const { dataSources, selectedTable } = useData();
 
   return (
     <DataProvider>
@@ -30,12 +25,13 @@ const App = () => {
             {currentConfig === 'other' && <OtherConfig />}
             {currentConfig === 'charts' && (
               <ChartCanvas>
-                <VictoryBarChart data={sampleData} />
+                <BarChart />
               </ChartCanvas>
             )}
           </>
         )}
       </div>
+
     </DataProvider>
   );
 };

@@ -1,9 +1,8 @@
 import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import { Table, Divider, Upload, Select, message } from 'antd';
-import Papa from 'papaparse';
+import { parseCSV } from '../utils/csvParser'; // Adjust the import path as necessary
 import { useData } from './DataContext';
-
 const { Dragger } = Upload;
 
 const DataConfig = () => {
@@ -21,57 +20,14 @@ const DataConfig = () => {
     } = useData();
 
     const handleFileRead = (file, onSuccess) => {
-        Papa.parse(file, {
-            complete: (result) => {
-                const data = result.data;
-                if (data.length > 0) {
-                    const headers = data[0];
-                    const formattedColumns = headers.map((header, index) => {
-                        const dataIndex = header.toLowerCase();
-                        return {
-                            title: header,
-                            dataIndex: dataIndex,
-                            key: index,
-                            sorter: (a, b) => {
-                                const valueA = a[dataIndex];
-                                const valueB = b[dataIndex];
-                                // Handle undefined values by treating them as empty strings for comparison
-                                if (valueA === undefined && valueB === undefined) {
-                                    return 0;
-                                }
-                                if (valueA === undefined) {
-                                    return -1;
-                                }
-                                if (valueB === undefined) {
-                                    return 1;
-                                }
-                                // Check if the values are numbers to perform a numeric sort
-                                if (!isNaN(Number(valueA)) && !isNaN(Number(valueB))) {
-                                    return Number(valueA) - Number(valueB);
-                                }
-                                // Fallback to string comparison if not numbers
-                                return valueA.localeCompare(valueB);
-                            },
-                        };
-                    });
-                    const formattedData = data.slice(1).map((row, index) => {
-                        const rowData = {};
-                        headers.forEach((header, i) => {
-                            rowData[header.toLowerCase()] = row[i];
-                        });
-                        return { key: index, ...rowData };
-                    });
+        parseCSV(file, (formattedColumns, formattedData) => {
+            // Update the shared state
+            setDataSources(prev => ({ ...prev, [file.name]: formattedData }));
+            setColumns(prev => ({ ...prev, [file.name]: formattedColumns }));
+            setTableNames(prev => [...prev, file.name]);
+            if (!selectedTable) setSelectedTable(file.name);
 
-                    // Update the shared state
-                    setDataSources(prev => ({ ...prev, [file.name]: formattedData }));
-                    setColumns(prev => ({ ...prev, [file.name]: formattedColumns }));
-                    setTableNames(prev => [...prev, file.name]);
-                    if (!selectedTable) setSelectedTable(file.name);
-
-                    onSuccess();
-                }
-            },
-            header: false,
+            onSuccess();
         });
     };
 
@@ -128,7 +84,7 @@ const DataConfig = () => {
     };
 
     return (
-        <div className='m6'>
+        <div className='my-6 mx-6'>
             <Dragger {...props}>
                 <p className="ant-upload-drag-icon">
                     <InboxOutlined />
