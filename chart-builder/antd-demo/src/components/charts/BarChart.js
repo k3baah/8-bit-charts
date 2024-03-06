@@ -30,16 +30,16 @@ const BarChart = () => {
         dependentAxis
         tickFormat={(y) => (`${y}`)}
       />
-      <VictoryGroup>
+      <VictoryGroup
+        offset={20}
+        colorScale={"qualitative"}
+      >
         {transformedData.map((data, index) => (
           <VictoryBar
             key={selectedValues[index]}
             data={data}
             x="x"
             y="y"
-            style={{
-              data: { fill: "#c43a31" },
-            }}
           />
         ))}
       </VictoryGroup>
