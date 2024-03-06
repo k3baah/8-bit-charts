@@ -1,5 +1,5 @@
 import React from 'react';
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme, VictoryGroup } from 'victory';
+import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme, VictoryGroup, VictoryLegend } from 'victory';
 import { useData } from '../DataContext';
 
 const BarChart = () => {
@@ -13,15 +13,27 @@ const BarChart = () => {
     }));
   });
 
-  console.log("Current transformed data:", transformedData);
+  // Prepare legend data
+  const legendData = selectedValues.map(value => ({
+    name: value, // Assuming you want to use the selectedValues as the legend names
+    symbol: { type: "square" } // Customize symbol shape, many shapes available e.g., circle, diamond, square, etc.
+  }));
 
   return (
     <VictoryChart
       theme={VictoryTheme.material}
       domainPadding={20}
       width={500}
-      height={200}
+      height={300} // Increased height to accommodate legend
     >
+      <VictoryLegend x={125} y={0} // Positioning of the legend
+        title="Legend"
+        centerTitle
+        orientation="horizontal"
+        gutter={20} // Space between legend entries
+        style={{ border: { stroke: "black" }, title: {fontSize: 10 } }}
+        data={legendData}
+      />
       <VictoryAxis
         tickValues={chartData.map(d => d[selectedKey])}
         tickFormat={chartData.map(d => d[selectedKey])}
