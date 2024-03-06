@@ -52,21 +52,21 @@ const ChartConfig = () => {
           <div className='my-3'>Chart Type</div>
           <Flex gap='small'>
             <Button icon={<BarChartOutlined />}>Bar Chart</Button>
-            <Button icon={<PieChartOutlined />}>Pie Chart</Button>
-            <Button icon={<LineChartOutlined />}>Line Chart</Button>
-            <Button icon={<DotChartOutlined />}>Scatter Chart</Button>
-            <Button icon={<HeatMapOutlined />}>Heatmap</Button>
-            <Button icon={<CalendarOutlined />}>Calendar</Button>
-            <Button icon={<TableOutlined />}>Table</Button>
+            <Button icon={<PieChartOutlined />} disabled>Pie Chart</Button>
+            <Button icon={<LineChartOutlined />} disabled>Line Chart</Button>
+            <Button icon={<DotChartOutlined />} disabled>Scatter Chart</Button>
+            <Button icon={<HeatMapOutlined />} disabled>Heatmap</Button>
+            <Button icon={<CalendarOutlined />} disabled>Calendar</Button>
+            <Button icon={<TableOutlined />} disabled>Table</Button>
           </Flex>
         </Flex>
         <Flex vertical>
           <div className='my-3'>Chart Style</div>
           <Flex gap='small'>
-            <Button icon={<BorderOutlined />}>Modern</Button>
-            <Button icon={<BuildOutlined />}>Pixel Art</Button>
-            <Button icon={<EditOutlined />}>Sketch</Button>
-            <Button icon={<SignatureOutlined />}>Fancy</Button>
+            <Button icon={<BorderOutlined />} disabled>Modern</Button>
+            <Button icon={<BuildOutlined />} disabled>Pixel Art</Button>
+            <Button icon={<EditOutlined />} disabled>Sketch</Button>
+            <Button icon={<SignatureOutlined />} disabled>Fancy</Button>
           </Flex>
         </Flex>
       </Flex>

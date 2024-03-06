@@ -4,7 +4,7 @@ import { ColorPicker, Space, Flex } from 'antd';
 const Demo = () => {
     return (
         <Space direction="vertical">
-            <ColorPicker defaultValue="#1677ff" showText />
+            <ColorPicker defaultValue="#1677ff" showText disabled />
         </Space>
     );
 }
