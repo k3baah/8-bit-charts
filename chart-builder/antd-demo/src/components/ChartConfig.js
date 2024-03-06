@@ -64,7 +64,7 @@ const ChartConfig = () => {
           <div className='my-3'>Chart Style</div>
           <Flex gap='small'>
             <Button icon={<BorderOutlined />} disabled>Modern</Button>
-            <Button icon={<BuildOutlined />} disabled>Pixel Art</Button>
+            <Button icon={<BuildOutlined />} >Pixel Art</Button>
             <Button icon={<EditOutlined />} disabled>Sketch</Button>
             <Button icon={<SignatureOutlined />} disabled>Fancy</Button>
           </Flex>
